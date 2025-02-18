@@ -5,9 +5,11 @@
     <packaging>pom</packaging>
     <modules>
         <module>common</module>
+
         <module>noteservice</module>
 		<module>labelservice</module>
 		<module>authservice</module>
+		<module>apigateway</module>
 	</modules>
     <parent>
 		<groupId>org.springframework.boot</groupId>
@@ -19,7 +21,7 @@
 	<artifactId>scribble-mate-micro</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>scribble-mate-micro</name>
-	<description>Scribblemate -note app- Spring Boot</description>
+	<description>Scribblemate-note app-Spring Boot</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -34,9 +36,11 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>17</java.version>
+		<maven.compiler.source>18</maven.compiler.source>
+		<maven.compiler.target>18</maven.compiler.target>
 	</properties>
 	<dependencies>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -50,6 +54,31 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.32</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>

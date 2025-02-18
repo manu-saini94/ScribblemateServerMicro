@@ -15,10 +15,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
 	Optional<User> findByEmail(String email);
 
-//	List<User> findAllByEmail(Iterable<String> emails);
+	Optional<User> findById(Long userId);
 
-	List<User> findAllByEmailIn(Iterable<String> emails);
-
-	@Query("SELECT u.id, u.createdAt, u.email, u.fullName, u.profilePicture, u.status, u.updatedAt FROM User u WHERE u.email = :email")
-	List<Object[]> findSpecificFieldsByEmail(@Param("email") String email);
 }

@@ -1,15 +1,12 @@
 package com.scribblemate.services;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-
-import com.scribblemate.exceptions.auth.*;
+import com.scribblemate.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,9 +38,6 @@ public class AuthenticationService {
 
     @Value("${security.jwt.access-expiration-time}")
     private Long accessTokenDurationMs;
-
-    @Autowired
-    private JwtAuthenticationService jwtAuthenticationService;
 
     @Autowired
     private UserService userService;
@@ -117,9 +111,9 @@ public class AuthenticationService {
     }
 
     public void setTokensAndCookies(User user, HttpServletResponse response) {
-        String jwtAccessToken = jwtService.generateToken(user);
+        String jwtAccessToken = jwtService.generateToken(user.getEmail() ,user.getId());
         Cookie newAccessTokenCookie = createAndReturnCookieWithAccessToken(jwtAccessToken);
-        String jwtRefreshToken = jwtService.generateRefreshToken(user);
+        String jwtRefreshToken = jwtService.generateRefreshToken(user.getEmail() ,user.getId());
         Cookie newRefreshTokenCookie = createAndReturnCookieWithRefreshToken(jwtRefreshToken);
         addCookies(response, newAccessTokenCookie, newRefreshTokenCookie);
     }
@@ -148,9 +142,6 @@ public class AuthenticationService {
             StringBuilder cookieHeader = new StringBuilder();
             cookieHeader.append(cookie.getName()).append("=").append(cookie.getValue()).append("; Max-Age=")
                     .append(cookie.getMaxAge()).append("; Path=").append(cookie.getPath());
-//			if ("refreshToken".equals(cookie.getName())) {
-//				cookieHeader.append("; HttpOnly");
-//			}
             cookieHeader.append("; SameSite=none; Secure");
             response.addHeader("Set-Cookie", cookieHeader.toString());
         }
@@ -199,7 +190,6 @@ public class AuthenticationService {
                         throw new TokenMissingOrInvalidException("Token is missing or invalid");
                     }
                     Cookie invalidCookie = new Cookie(cookie.getName(), null);
-//					invalidCookie.setHttpOnly("refreshToken".equals(cookie.getName())); // HttpOnly for refresh token
                     invalidCookie.setPath("/");
                     invalidCookie.setMaxAge(0);
                     response.addCookie(invalidCookie);

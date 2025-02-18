@@ -3,15 +3,12 @@ package com.scribblemate.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.scribblemate.exceptions.auth.UserNotDeletedException;
-import com.scribblemate.exceptions.auth.UserNotFoundException;
+import com.scribblemate.exceptions.UserNotDeletedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.scribblemate.dto.CollaboratorDto;
 import com.scribblemate.dto.UserResponseDto;
 import com.scribblemate.entities.User;
-import com.scribblemate.exceptions.auth.TokenExpiredException;
-import com.scribblemate.exceptions.auth.TokenMissingOrInvalidException;
 import com.scribblemate.repositories.UserRepository;
 import com.scribblemate.utility.UserUtils.Status;
 import com.scribblemate.utility.UserUtils.TokenType;
