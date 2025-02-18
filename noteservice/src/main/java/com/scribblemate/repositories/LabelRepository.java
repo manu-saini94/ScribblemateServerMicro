@@ -14,10 +14,6 @@ import java.util.List;
 @Repository
 public interface LabelRepository extends JpaRepository<Label, Long> {
 
-	Label findByIdAndUser(Long id, User user);
-
-	List<Label> findAllByUserOrderByLabelName(User user);
-
 	@Transactional
 	@Modifying
 	@Query(value = "DELETE from label WHERE id = :labelId and user_id = :userId", nativeQuery = true)

@@ -1,8 +1,7 @@
 package com.scribblemate.dto;
 
 import java.time.LocalDateTime;
-
-import com.scribblemate.utility.UserUtils;
+import com.scribblemate.utility.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +15,7 @@ public class UserResponseDto {
 
 	private String email;
 
-	private UserUtils.Status status;
+	private Utils.Status status;
 
 	private LocalDateTime createdAt;
 

@@ -1,5 +1,6 @@
 package com.scribblemate.exceptions;
 
+import com.scribblemate.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -8,7 +9,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.scribblemate.responses.ErrorResponse;
-import com.scribblemate.utility.ResponseErrorUtils;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,12 +74,6 @@ public class GlobalExceptionController {
 	@ExceptionHandler(value = TokenExpiredException.class)
 	public ResponseEntity<ErrorResponse> handleTokenExpiredException(TokenExpiredException exp) {
 		return buildErrorResponse(HttpStatus.FORBIDDEN, ResponseErrorUtils.TOKEN_EXPIRED, exp.getMessage());
-	}
-
-	@ExceptionHandler(value = TokenDeletionException.class)
-	public ResponseEntity<ErrorResponse> handleTokenDeletionException(TokenDeletionException exp) {
-		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ResponseErrorUtils.TOKEN_DELETION_FAILED,
-				exp.getMessage());
 	}
 
 	@ExceptionHandler(value = Exception.class)

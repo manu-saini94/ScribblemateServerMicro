@@ -1,11 +1,11 @@
 package com.scribblemate.configuration;
 
 import java.io.IOException;
-
-import com.scribblemate.repositories.UserRepository;
+import com.scribblemate.exceptions.TokenExpiredException;
+import com.scribblemate.exceptions.TokenMissingOrInvalidException;
 import com.scribblemate.utility.UserUtils;
+import com.scribblemate.utility.Utils;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,9 +20,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-
 import com.scribblemate.services.JwtAuthenticationService;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -39,9 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${auth.api.prefix}")
     private String authApiPrefix;
     private RequestMatcher skipMatcher;
-
-    @Autowired
-    private UserRepository userRepository;
 
     public JwtAuthenticationFilter(HandlerExceptionResolver handlerExceptionResolver,
                                    JwtAuthenticationService jwtService, UserDetailsService userDetailsService) {
@@ -77,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String refreshTokenString = null;
             if (cookiesArray != null) {
                 for (Cookie cookie : cookiesArray) {
-                    if (UserUtils.TokenType.ACCESS_TOKEN.getValue().equals(cookie.getName())) {
+                    if (Utils.TokenType.ACCESS_TOKEN.getValue().equals(cookie.getName())) {
                         accessTokenString = cookie.getValue();
                         if (accessTokenString == null) {
                             throw new TokenMissingOrInvalidException("Access token not found in request cookies");
@@ -86,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         } else if (jwtService.isTokenExpired(accessTokenString)) {
                             throw new TokenExpiredException("Access token has expired!");
                         }
-                    } else if (UserUtils.TokenType.REFRESH_TOKEN.getValue().equals(cookie.getName())) {
+                    } else if (Utils.TokenType.REFRESH_TOKEN.getValue().equals(cookie.getName())) {
                         refreshTokenString = cookie.getValue();
                         if (refreshTokenString == null) {
                             throw new TokenMissingOrInvalidException("Refresh token not found in request cookies");
@@ -107,7 +102,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
                     if (jwtService.isTokenValid(accessTokenString, userDetails)) {
                         UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                                new UsernamePasswordAuthenticationToken(userDetails, null,
+                                        userDetails.getAuthorities());
                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }

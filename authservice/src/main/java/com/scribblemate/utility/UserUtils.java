@@ -11,32 +11,4 @@ public class UserUtils {
 
     public static final String FORGOT_URI = "/forgot";
 
-    public enum Status {
-        ACTIVE, INACTIVE;
-
-        public static Status findByName(String name) {
-            for (Status status : values()) {
-                if (status.name().equalsIgnoreCase(name)) {
-                    return status;
-                }
-            }
-            return null;
-        }
-    }
-
-    public enum TokenType {
-        ACCESS_TOKEN("accessToken"), REFRESH_TOKEN("refreshToken");
-
-        private final String value;
-
-        TokenType(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-
 }

@@ -3,8 +3,10 @@ package com.scribblemate.services;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import com.scribblemate.exceptions.UserNotFoundException;
 import com.scribblemate.exceptions.labels.*;
 import com.scribblemate.repositories.SpecificNoteRepository;
+import com.scribblemate.utility.LabelUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.scribblemate.dto.LabelDto;
@@ -12,7 +14,6 @@ import com.scribblemate.entities.Label;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.LabelRepository;
 import com.scribblemate.repositories.UserRepository;
-import com.scribblemate.utility.LabelUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +40,7 @@ public class LabelService {
             label.setImportant(labelDto.isImportant());
             label.setUser(user);
             if (labelSet == null) {
-                labelSet = new HashSet<Label>();
+                labelSet = new HashSet<>();
                 labelSet.add(label);
                 user.setLabelSet(labelSet);
             } else {

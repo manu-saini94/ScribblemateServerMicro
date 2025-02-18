@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import com.scribblemate.exceptions.UserNotFoundException;
+import com.scribblemate.utility.NoteUtils;
+import com.scribblemate.utility.ResponseErrorUtils;
+import com.scribblemate.utility.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.scribblemate.dto.CollaboratorDto;
@@ -121,7 +124,7 @@ public class NoteService {
                 SpecificNote specificNote = new SpecificNote();
                 specificNote.setCommonNote(commonNote);
                 specificNote.setUser(collaborator);
-                specificNote.setRole(NoteUtils.Role.COLLABORATOR);
+                specificNote.setRole(Utils.Role.COLLABORATOR);
                 List<SpecificNote> specificNoteList = commonNote.getSpecificNoteList();
                 if (specificNoteList == null) {
                     specificNoteList = new ArrayList<>();
@@ -556,7 +559,7 @@ public class NoteService {
                 SpecificNote specificNote = new SpecificNote();
                 specificNote.setCommonNote(mappedNote);
                 specificNote.setUser(collaborator);
-                specificNote.setRole(NoteUtils.Role.COLLABORATOR);
+                specificNote.setRole(Utils.Role.COLLABORATOR);
                 specificNoteRepository.save(specificNote);
             });
             if (mappedNote.getCollaboratorList() == null) {
@@ -628,7 +631,7 @@ public class NoteService {
             }
         }
         if (specificNote.getRole() == null) {
-            specificNote.setRole(NoteUtils.Role.OWNER);
+            specificNote.setRole(Utils.Role.OWNER);
         }
         specificNote.setPinned(noteDto.isPinned());
         specificNote.setReminder(noteDto.getReminder());

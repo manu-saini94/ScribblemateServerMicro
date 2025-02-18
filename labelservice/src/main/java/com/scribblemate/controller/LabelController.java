@@ -2,18 +2,15 @@ package com.scribblemate.controller;
 
 import java.util.List;
 
+import com.scribblemate.utility.ResponseSuccessUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.scribblemate.dto.LabelDto;
-import com.scribblemate.entities.User;
 import com.scribblemate.responses.SuccessResponse;
 import com.scribblemate.services.LabelService;
-import com.scribblemate.utility.ResponseSuccessUtils;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RequestMapping("${labels.api.prefix}")
 @RestController

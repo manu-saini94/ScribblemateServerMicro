@@ -1,6 +1,10 @@
 package com.scribblemate.controller;
 
 import java.util.List;
+
+import com.scribblemate.annotation.LoadUserContext;
+import com.scribblemate.aspect.UserContext;
+import com.scribblemate.utility.ResponseSuccessUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,17 +16,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.scribblemate.dto.CollaboratorDto;
 import com.scribblemate.dto.UserResponseDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.responses.SuccessResponse;
 import com.scribblemate.services.UserService;
-import com.scribblemate.utility.ResponseSuccessUtils;
 import jakarta.servlet.http.HttpServletRequest;
 
-@RequestMapping("${api.prefix}/users")
 @RestController
+@LoadUserContext
+@RequestMapping("${api.prefix}/users")
 @CrossOrigin(origins = "${allowed.origin}", allowedHeaders = "*", allowCredentials = "true")
 public class UserController {
 
@@ -46,7 +49,6 @@ public class UserController {
 	@GetMapping("/exist/{email}")
 	public ResponseEntity<SuccessResponse> checkCollaboratorExist(@PathVariable String email,
 			HttpServletRequest httpRequest) {
-		User user = userService.getUserFromHttpRequest(httpRequest);
 		CollaboratorDto collaboratorDto = userService.checkForUserExist(email);
 		return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK.value(),
 				ResponseSuccessUtils.CHECK_COLLABORATOR_EXIST, collaboratorDto));
@@ -54,7 +56,7 @@ public class UserController {
 
 	@DeleteMapping("/delete")
 	public ResponseEntity<SuccessResponse> deleteUser(HttpServletRequest httpRequest) {
-		User user = userService.getUserFromHttpRequest(httpRequest);
+		User user = UserContext.getCurrentUser();
 		boolean isDeleted = userService.deleteUser(user);
 		return ResponseEntity.ok()
 				.body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_DELETE_SUCCESS, isDeleted));

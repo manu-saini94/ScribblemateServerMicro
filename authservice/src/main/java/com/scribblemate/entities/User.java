@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import com.scribblemate.utility.Utils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.scribblemate.utility.UserUtils.Status;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,7 +50,7 @@ public class User implements UserDetails {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
-	private Status status;
+	private Utils.Status status;
 
 	@CreationTimestamp
 	@Column(updatable = false, name = "created_at")
@@ -148,11 +148,11 @@ public class User implements UserDetails {
 		super();
 	}
 
-	public Status getStatus() {
+	public Utils.Status getStatus() {
 		return status;
 	}
 
-	public User setStatus(Status status) {
+	public User setStatus(Utils.Status status) {
 		this.status = status;
 		return this;
 	}
