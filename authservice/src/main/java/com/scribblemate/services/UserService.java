@@ -85,6 +85,13 @@ public class UserService {
         return collaboratorDto;
     }
 
+    public User getUserFromJwt(String jwt) {
+        final String userEmail = jwtService.extractUsername(jwt);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + userEmail));
+        return user;
+    }
+
     public CollaboratorDto checkForUserExist(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User with this email does not exist"));
