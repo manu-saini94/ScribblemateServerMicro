@@ -32,7 +32,7 @@ public class NoteController {
     private NoteService noteService;
 
     @PostMapping("/create")
-    public ResponseEntity<SuccessResponse> createNote(@RequestBody NoteDto notedto, HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> createNote(@RequestBody NoteDto notedto) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.createNewNote(notedto, user);
         return ResponseEntity.ok()
@@ -41,7 +41,7 @@ public class NoteController {
 
     @PostMapping("/add/label")
     public ResponseEntity<SuccessResponse> addLabelToNote(@RequestParam("labelId") Long labelId,
-                                                          @RequestParam("noteId") Long noteId, HttpServletRequest httpRequest) {
+                                                          @RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.addLabelToNote(user, noteId, labelId);
         return ResponseEntity.ok()
@@ -50,7 +50,7 @@ public class NoteController {
 
     @DeleteMapping("/delete/label")
     public ResponseEntity<SuccessResponse> removeLabelFromNote(@RequestParam("noteId") Long noteId,
-                                                               @RequestParam("labelId") Long labelId, HttpServletRequest httpRequest) {
+                                                               @RequestParam("labelId") Long labelId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.deleteLabelFromNote(user, noteId, labelId);
         return ResponseEntity.ok().body(
@@ -58,7 +58,7 @@ public class NoteController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<SuccessResponse> getAllNotes(HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> getAllNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesForUser(user);
         return ResponseEntity.ok().body(
@@ -66,8 +66,7 @@ public class NoteController {
     }
 
     @GetMapping("/label")
-    public ResponseEntity<SuccessResponse> getNotesByLabel(@RequestParam("labelId") Long labelId,
-                                                           HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> getNotesByLabel(@RequestParam("labelId") Long labelId) {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getNotesByUserAndLabelId(user, labelId);
         return ResponseEntity.ok().body(
@@ -75,7 +74,7 @@ public class NoteController {
     }
 
     @GetMapping("/label/all")
-    public ResponseEntity<SuccessResponse> getAllNotesByLabelIds(HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> getAllNotesByLabelIds() {
         User user = UserContext.getCurrentUser();
         Map<Long, List<Long>> notesMap = noteService.getAllNotesByUserAndLabelIds(user);
         return ResponseEntity.ok()
@@ -83,7 +82,7 @@ public class NoteController {
     }
 
     @GetMapping("/labelled")
-    public ResponseEntity<SuccessResponse> getAllNotesWithLabels(HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> getAllNotesWithLabels() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesWithLabelsByUser(user);
         return ResponseEntity.ok().body(
@@ -91,8 +90,7 @@ public class NoteController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<SuccessResponse> getNote(HttpServletRequest httpRequest,
-                                                   @RequestParam("noteId") Long noteId) {
+    public ResponseEntity<SuccessResponse> getNote(@RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.getNoteById(user, noteId);
         return ResponseEntity.ok()
@@ -100,7 +98,7 @@ public class NoteController {
     }
 
     @GetMapping("/get/trash")
-    public ResponseEntity<SuccessResponse> getAllTrashedNotes(HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> getAllTrashedNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesByIsTrashed(user);
         return ResponseEntity.ok().body(
@@ -108,7 +106,7 @@ public class NoteController {
     }
 
     @GetMapping("/get/archive")
-    public ResponseEntity<SuccessResponse> getAllArchivedNotes(HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> getAllArchivedNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesByIsArchived(user);
         return ResponseEntity.ok().body(
@@ -116,7 +114,7 @@ public class NoteController {
     }
 
     @GetMapping("/get/reminder")
-    public ResponseEntity<SuccessResponse> getAllReminderNotes(HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> getAllReminderNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesByReminder(user);
         return ResponseEntity.ok().body(
@@ -124,7 +122,7 @@ public class NoteController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<SuccessResponse> updateNote(@RequestBody NoteDto notedto, HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> updateNote(@RequestBody NoteDto notedto) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.updateExistingNote(notedto, user);
         return ResponseEntity.ok()
@@ -132,8 +130,7 @@ public class NoteController {
     }
 
     @PutMapping("/update/pin")
-    public ResponseEntity<SuccessResponse> pinNote(@RequestParam("noteId") Long noteId,
-                                                   HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> pinNote(@RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.pinNote(user, noteId);
         return ResponseEntity.ok()
@@ -141,8 +138,7 @@ public class NoteController {
     }
 
     @PutMapping("/update/color")
-    public ResponseEntity<SuccessResponse> updateColor(@RequestBody ColorUpdateDto colorDto,
-                                                       HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> updateColor(@RequestBody ColorUpdateDto colorDto) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.updateColorOfNote(user, colorDto);
         return ResponseEntity.ok()
@@ -150,8 +146,7 @@ public class NoteController {
     }
 
     @PutMapping("/update/archive")
-    public ResponseEntity<SuccessResponse> archiveNote(@RequestParam("noteId") Long noteId,
-                                                       HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> archiveNote(@RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.archiveNote(user, noteId);
         return ResponseEntity.ok()
@@ -159,8 +154,7 @@ public class NoteController {
     }
 
     @PutMapping("/update/trash")
-    public ResponseEntity<SuccessResponse> trashNote(@RequestParam("noteId") Long noteId,
-                                                     HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> trashNote(@RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.trashNote(user, noteId);
         return ResponseEntity.ok()
@@ -169,8 +163,7 @@ public class NoteController {
 
     @PostMapping("/add/collaborator")
     public ResponseEntity<SuccessResponse> addCollaboratorToNote(
-            @RequestParam("collaboratorEmail") String collaboratorEmail, @RequestParam("noteId") Long noteId,
-            HttpServletRequest httpRequest) {
+            @RequestParam("collaboratorEmail") String collaboratorEmail, @RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.addCollaboratorToNote(user, noteId, collaboratorEmail);
         return ResponseEntity.ok()
@@ -179,7 +172,7 @@ public class NoteController {
 
     @DeleteMapping("/delete/collaborator")
     public ResponseEntity<SuccessResponse> removeCollaboratorFromNote(@RequestParam("noteId") Long noteId,
-                                                                      @RequestParam("collaboratorEmail") String collaboratorEmail, HttpServletRequest httpRequest) {
+                                                                      @RequestParam("collaboratorEmail") String collaboratorEmail) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.deleteCollaboratorFromNote(user, noteId, collaboratorEmail);
         return ResponseEntity.ok().body(
@@ -187,8 +180,7 @@ public class NoteController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<SuccessResponse> deleteNoteByUser(@RequestParam("noteId") Long noteId,
-                                                            HttpServletRequest httpRequest) {
+    public ResponseEntity<SuccessResponse> deleteNoteByUser(@RequestParam("noteId") Long noteId) {
 
         User user = UserContext.getCurrentUser();
         boolean isDeleted = noteService.deleteNoteByUserAndId(user, noteId);
