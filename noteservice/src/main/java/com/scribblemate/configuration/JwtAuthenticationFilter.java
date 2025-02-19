@@ -1,17 +1,19 @@
 package com.scribblemate.configuration;
 
 import java.io.IOException;
+import com.scribblemate.entities.User;
+import com.scribblemate.common.exceptions.TokenExpiredException;
+import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.repositories.UserRepository;
+import com.scribblemate.common.services.JwtAuthenticationService;
+import com.scribblemate.common.utility.Utils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -21,67 +23,49 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final HandlerExceptionResolver handlerExceptionResolver;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
-	private final JwtAuthenticationService jwtService;
-	private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationService jwtService;
 
-	public JwtAuthenticationFilter(HandlerExceptionResolver handlerExceptionResolver,
-			JwtAuthenticationService jwtService, UserDetailsService userDetailsService) {
-		this.handlerExceptionResolver = handlerExceptionResolver;
-		this.jwtService = jwtService;
-		this.userDetailsService = userDetailsService;
-	}
+    @Autowired
+    private UserRepository userRepository;
 
-	@Override
-	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-			@NonNull FilterChain filterChain) throws ServletException, IOException {
-		// Extract accessToken from cookies
-		Cookie[] cookies = request.getCookies();
-		String jwt = null;
+    public JwtAuthenticationFilter(HandlerExceptionResolver handlerExceptionResolver,
+                                   JwtAuthenticationService jwtService, UserDetailsService userDetailsService) {
+        this.handlerExceptionResolver = handlerExceptionResolver;
+        this.jwtService = jwtService;
+    }
 
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if ("accessToken".equals(cookie.getName())) {
-					jwt = cookie.getValue();
-					break;
-				}
-			}
-		}
-
-		// If accessToken is missing, proceed with the filter chain
-		if (jwt == null) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-
-		try {
-			// Extract the user email from the JWT token
-			String userEmail = jwtService.extractUsername(jwt);
-
-			// Check if the user is already authenticated
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-			if (userEmail != null && authentication == null) {
-				UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
-				// Validate the JWT token
-				if (jwtService.isTokenValid(jwt, userDetails)) {
-					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-							null, userDetails.getAuthorities());
-
-					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext().setAuthentication(authToken);
-				}
-			}
-
-			// Continue with the filter chain
-			filterChain.doFilter(request, response);
-
-		} catch (Exception exception) {
-			// Handle any exceptions that occur during authentication
-			handlerExceptionResolver.resolveException(request, response, null, exception);
-		}
-	}
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+        Cookie[] cookiesArray = request.getCookies();
+        String accessTokenString = null;
+        try {
+            if (cookiesArray != null) {
+                for (Cookie cookie : cookiesArray) {
+                    if (Utils.TokenType.ACCESS_TOKEN.getValue().equals(cookie.getName())) {
+                        accessTokenString = cookie.getValue();
+                        if (accessTokenString == null) {
+                            throw new TokenMissingOrInvalidException("Access token not found in request cookies");
+                        } else if (!jwtService.isAccessToken(accessTokenString)) {
+                            throw new TokenMissingOrInvalidException("Access token is Invalid!");
+                        } else if (jwtService.isTokenExpired(accessTokenString)) {
+                            throw new TokenExpiredException("Access token has expired!");
+                        }
+                    }
+                }
+            } else {
+                throw new TokenMissingOrInvalidException("Cookies are missing from the request");
+            }
+            String userEmail = jwtService.extractUsername(accessTokenString);
+            User user = userRepository.findByEmail(userEmail).orElseThrow(() ->
+                    new UserNotFoundException("User not found with email : " + userEmail));
+            UserContext.setCurrentUser(user);
+            filterChain.doFilter(request, response);
+        } catch (Exception exception) {
+            handlerExceptionResolver.resolveException(request, response, null, exception);
+        }
+    }
 
 }

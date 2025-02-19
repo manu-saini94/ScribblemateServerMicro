@@ -1,15 +1,19 @@
 package com.scribblemate.services;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import com.scribblemate.exceptions.auth.*;
+import com.scribblemate.common.exceptions.TokenExpiredException;
+import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.common.services.EmailService;
+import com.scribblemate.common.services.JwtAuthenticationService;
+import com.scribblemate.exceptions.*;
+import com.scribblemate.common.utility.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,8 +27,6 @@ import com.scribblemate.dto.RegistrationDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.UserRepository;
 import com.scribblemate.utility.UserUtils;
-import com.scribblemate.utility.UserUtils.Status;
-import com.scribblemate.utility.UserUtils.TokenType;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,9 +43,6 @@ public class AuthenticationService {
 
     @Value("${security.jwt.access-expiration-time}")
     private Long accessTokenDurationMs;
-
-    @Autowired
-    private JwtAuthenticationService jwtAuthenticationService;
 
     @Autowired
     private UserService userService;
@@ -70,7 +69,7 @@ public class AuthenticationService {
         User newUser = null;
         try {
             newUser = new User().setFullName(input.getFullName()).setEmail(input.getEmail())
-                    .setPassword(passwordEncoder.encode(input.getPassword())).setStatus(Status.ACTIVE);
+                    .setPassword(passwordEncoder.encode(input.getPassword())).setStatus(Utils.Status.ACTIVE);
             return userRepository.save(newUser);
         } catch (Exception exp) {
             log.error(UserUtils.ERROR_PERSISTING_USER, newUser);
@@ -91,7 +90,7 @@ public class AuthenticationService {
                 String email = (String) row[2];
                 String fullName = (String) row[3];
                 String profilePicture = (String) row[4];
-                Status status = (Status) row[5];
+                Utils.Status status = (Utils.Status) row[5];
                 LocalDateTime updatedAt = (LocalDateTime) row[6];
                 user.setId(id);
                 user.setCreatedAt(createdAt);
@@ -110,28 +109,28 @@ public class AuthenticationService {
 
     public User authenticate(@RequestBody LoginDto loginUserDto, HttpServletResponse response) {
         User authenticatedUser = authenticate(loginUserDto);
-        if (authenticatedUser.getStatus().equals(Status.INACTIVE))
+        if (authenticatedUser.getStatus().equals(Utils.Status.INACTIVE))
             throw new UserInactiveException();
         setTokensAndCookies(authenticatedUser, response);
         return authenticatedUser;
     }
 
     public void setTokensAndCookies(User user, HttpServletResponse response) {
-        String jwtAccessToken = jwtService.generateToken(user);
+        String jwtAccessToken = jwtService.generateToken(user.getEmail(), user.getId());
         Cookie newAccessTokenCookie = createAndReturnCookieWithAccessToken(jwtAccessToken);
-        String jwtRefreshToken = jwtService.generateRefreshToken(user);
+        String jwtRefreshToken = jwtService.generateRefreshToken(user.getEmail(), user.getId());
         Cookie newRefreshTokenCookie = createAndReturnCookieWithRefreshToken(jwtRefreshToken);
         addCookies(response, newAccessTokenCookie, newRefreshTokenCookie);
     }
 
     public Cookie createAndReturnCookieWithRefreshToken(String token) {
-        Cookie newRefreshTokenCookie = new Cookie(TokenType.REFRESH_TOKEN.getValue(), token);
+        Cookie newRefreshTokenCookie = new Cookie(Utils.TokenType.REFRESH_TOKEN.getValue(), token);
         newRefreshTokenCookie.setMaxAge((int) (refreshTokenDurationMs / 1000));
         return setCommonHeadersAndReturnCookie(newRefreshTokenCookie);
     }
 
     public Cookie createAndReturnCookieWithAccessToken(String token) {
-        Cookie newAccessTokenCookie = new Cookie(TokenType.ACCESS_TOKEN.getValue(), token);
+        Cookie newAccessTokenCookie = new Cookie(Utils.TokenType.ACCESS_TOKEN.getValue(), token);
         newAccessTokenCookie.setMaxAge((int) (accessTokenDurationMs / 1000));
         return setCommonHeadersAndReturnCookie(newAccessTokenCookie);
     }
@@ -148,9 +147,6 @@ public class AuthenticationService {
             StringBuilder cookieHeader = new StringBuilder();
             cookieHeader.append(cookie.getName()).append("=").append(cookie.getValue()).append("; Max-Age=")
                     .append(cookie.getMaxAge()).append("; Path=").append(cookie.getPath());
-//			if ("refreshToken".equals(cookie.getName())) {
-//				cookieHeader.append("; HttpOnly");
-//			}
             cookieHeader.append("; SameSite=none; Secure");
             response.addHeader("Set-Cookie", cookieHeader.toString());
         }
@@ -171,7 +167,7 @@ public class AuthenticationService {
         User user = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (UserUtils.TokenType.REFRESH_TOKEN.getValue().equals(cookie.getName())) {
+                if (Utils.TokenType.REFRESH_TOKEN.getValue().equals(cookie.getName())) {
                     refreshTokenValue = cookie.getValue();
                     break;
                 }
@@ -193,13 +189,12 @@ public class AuthenticationService {
         Cookie[] cookiesArray = request.getCookies();
         if (cookiesArray != null) {
             for (Cookie cookie : cookiesArray) {
-                if ("accessToken".equals(cookie.getName()) || "refreshToken".equals(cookie.getName())) {
+                if (Utils.TokenType.ACCESS_TOKEN.equals(cookie.getName()) || Utils.TokenType.REFRESH_TOKEN.equals(cookie.getName())) {
                     String tokenString = cookie.getValue();
                     if (tokenString == null) {
                         throw new TokenMissingOrInvalidException("Token is missing or invalid");
                     }
                     Cookie invalidCookie = new Cookie(cookie.getName(), null);
-//					invalidCookie.setHttpOnly("refreshToken".equals(cookie.getName())); // HttpOnly for refresh token
                     invalidCookie.setPath("/");
                     invalidCookie.setMaxAge(0);
                     response.addCookie(invalidCookie);

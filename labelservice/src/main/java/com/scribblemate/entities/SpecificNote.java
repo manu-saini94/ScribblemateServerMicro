@@ -1,7 +1,6 @@
 package com.scribblemate.entities;
 
 import java.util.Set;
-
 import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import lombok.AllArgsConstructor;

@@ -3,20 +3,16 @@ package com.scribblemate.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.scribblemate.exceptions.auth.UserNotDeletedException;
-import com.scribblemate.exceptions.auth.UserNotFoundException;
+import com.scribblemate.common.services.JwtAuthenticationService;
+import com.scribblemate.exceptions.UserNotDeletedException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.common.utility.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.scribblemate.dto.CollaboratorDto;
 import com.scribblemate.dto.UserResponseDto;
 import com.scribblemate.entities.User;
-import com.scribblemate.exceptions.auth.TokenExpiredException;
-import com.scribblemate.exceptions.auth.TokenMissingOrInvalidException;
 import com.scribblemate.repositories.UserRepository;
-import com.scribblemate.utility.UserUtils.Status;
-import com.scribblemate.utility.UserUtils.TokenType;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,45 +33,6 @@ public class UserService {
         return usersDtoList;
     }
 
-    public User getUserFromHttpRequest(HttpServletRequest httpRequest) {
-        Cookie[] cookiesArray = httpRequest.getCookies();
-        String accessTokenString = null;
-        String refreshTokenString = null;
-        if (cookiesArray != null) {
-            for (Cookie cookie : cookiesArray) {
-                if (TokenType.ACCESS_TOKEN.getValue().equals(cookie.getName())) {
-                    accessTokenString = cookie.getValue();
-                    if (accessTokenString == null) {
-                        throw new TokenMissingOrInvalidException("Access token not found in request cookies");
-                    } else if (!jwtService.isAccessToken(accessTokenString)) {
-                        throw new TokenMissingOrInvalidException("Access token is Invalid!");
-                    } else if (jwtService.isTokenExpired(accessTokenString)) {
-                        throw new TokenExpiredException("Access token has expired!");
-                    }
-
-                } else if (TokenType.REFRESH_TOKEN.getValue().equals(cookie.getName())) {
-                    refreshTokenString = cookie.getValue();
-                    if (refreshTokenString == null) {
-                        throw new TokenMissingOrInvalidException("Refresh token not found in request cookies");
-                    } else if (!jwtService.isRefreshToken(refreshTokenString)) {
-                        throw new TokenMissingOrInvalidException("Refresh token is Invalid!");
-                    } else if (jwtService.isTokenExpired(refreshTokenString)) {
-                        throw new TokenExpiredException("Refresh token has expired!");
-                    }
-                }
-            }
-        } else {
-            throw new TokenMissingOrInvalidException("Cookies are missing from the request");
-        }
-        return getUserFromJwt(accessTokenString);
-    }
-
-    public User getUserFromJwt(String jwt) {
-        final String userEmail = jwtService.extractUsername(jwt);
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + userEmail));
-        return user;
-    }
 
     @Transactional
     public boolean deleteUser(User currentUser) {
@@ -100,7 +57,7 @@ public class UserService {
 //				noteRepository.save(note);
 //			});
 //			user.getLabelSet().clear();
-            user.setStatus(Status.INACTIVE);
+            user.setStatus(Utils.Status.INACTIVE);
             userRepository.save(user);
             return true;
         } catch (Exception exp) {
@@ -128,6 +85,13 @@ public class UserService {
         collaboratorDto.setName(user.getFullName());
         collaboratorDto.setId(user.getId());
         return collaboratorDto;
+    }
+
+    public User getUserFromJwt(String jwt) {
+        final String userEmail = jwtService.extractUsername(jwt);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + userEmail));
+        return user;
     }
 
     public CollaboratorDto checkForUserExist(String email) {

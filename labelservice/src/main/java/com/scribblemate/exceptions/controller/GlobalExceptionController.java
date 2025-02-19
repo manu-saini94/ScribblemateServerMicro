@@ -1,15 +1,13 @@
 package com.scribblemate.exceptions.controller;
 
 import com.scribblemate.exceptions.labels.*;
+import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AccountStatusException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.scribblemate.responses.ErrorResponse;
-import com.scribblemate.utility.ResponseErrorUtils;
+import com.scribblemate.common.responses.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
@@ -20,17 +18,6 @@ public class GlobalExceptionController {
                                                              String message) {
         ErrorResponse errorResponse = new ErrorResponse(status.value(), error.name(), message);
         return ResponseEntity.status(status).body(errorResponse);
-    }
-
-    @ExceptionHandler(value = BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException exp) {
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ResponseErrorUtils.USERNAME_OR_PASSWORD_INCORRECT,
-                exp.getMessage());
-    }
-
-    @ExceptionHandler(value = AccountStatusException.class)
-    public ResponseEntity<ErrorResponse> handleAccountStatusException(AccountStatusException exp) {
-        return buildErrorResponse(HttpStatus.FORBIDDEN, ResponseErrorUtils.ACCOUNT_IS_LOCKED, exp.getMessage());
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)

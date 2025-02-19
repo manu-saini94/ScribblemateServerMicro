@@ -7,6 +7,7 @@ public class NoteUtils {
 	public static final String NOTE_NOT_FOUND = "Note not found with the following id : {}";
 	public static final String NOTE_UPDATE_SUCCESS = "Note updated successfully with following details : {}";
 	public static final String NOTE_UPDATE_ERROR = "Error occurred while updating note: {}";
+	public static final String NOTES_NOT_FOUND_FOR_USER = "Notes not found for the following user : {}";
 	public static final String NOTE_CREATED_AND_RETURN = "Created NoteDto from note and returned : {}";
 	public static final String NOTE_FETCH_SUCCESS = "Successfully fetched all notes for user : {}";
 	public static final String NOTE_DELETE_SUCCESS = "Successfully deleted the note with id : {}";
@@ -23,18 +24,5 @@ public class NoteUtils {
 	public static final String LABEL_DELETE_SUCCESS = "Successfully deleted the label with id : {}";
 	public static final String LABEL_DELETE_ERROR = "Error occurred while deleting label with id : {}";
 	public static final String ERROR_DELETING_USER = "Error occurred while deleting user with id : {}";
-
-	public enum Role {
-		OWNER, COLLABORATOR;
-
-		public static Role findByName(String name) {
-			for (Role role : values()) {
-				if (role.name().equalsIgnoreCase(name)) {
-					return role;
-				}
-			}
-			return null;
-		}
-	}
 
 }

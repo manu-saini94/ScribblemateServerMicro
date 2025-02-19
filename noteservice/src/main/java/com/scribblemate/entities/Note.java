@@ -1,6 +1,8 @@
 package com.scribblemate.entities;
 
 import java.util.List;
+
+import com.scribblemate.common.entities.CommonFields;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
