@@ -2,6 +2,8 @@ package com.scribblemate.entities;
 
 import java.util.List;
 import java.util.Objects;
+
+import com.scribblemate.common.entities.CommonFields;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;

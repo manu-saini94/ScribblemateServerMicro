@@ -1,4 +1,4 @@
-package com.scribblemate.services;
+package com.scribblemate.common.services;
 
 import java.util.Properties;
 import javax.mail.Authenticator;

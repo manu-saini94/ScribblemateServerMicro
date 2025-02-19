@@ -1,15 +1,13 @@
 package com.scribblemate.exceptions.controller;
 
 import com.scribblemate.exceptions.labels.*;
-import com.scribblemate.utility.ResponseErrorUtils;
+import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AccountStatusException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.scribblemate.responses.ErrorResponse;
+import com.scribblemate.common.responses.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice

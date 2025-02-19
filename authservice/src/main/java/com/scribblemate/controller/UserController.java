@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.scribblemate.annotation.LoadUserContext;
 import com.scribblemate.aspect.UserContext;
-import com.scribblemate.utility.ResponseSuccessUtils;
+import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.scribblemate.dto.CollaboratorDto;
 import com.scribblemate.dto.UserResponseDto;
 import com.scribblemate.entities.User;
-import com.scribblemate.responses.SuccessResponse;
+import com.scribblemate.common.responses.SuccessResponse;
 import com.scribblemate.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 

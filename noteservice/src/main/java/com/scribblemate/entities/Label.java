@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.util.List;
 
 @Entity
-@Table(name = "label", indexes = {@Index(name = "index_user_labelName", columnList = "userId,labelName")})
+@Table(name = "label")
 @Getter
 @Setter
 @SuperBuilder

@@ -2,9 +2,9 @@ package com.scribblemate.controller;
 
 import java.util.List;
 import java.util.Map;
-import com.scribblemate.aspect.UserContext;
-import com.scribblemate.responses.SuccessResponse;
-import com.scribblemate.utility.ResponseSuccessUtils;
+import com.scribblemate.configuration.UserContext;
+import com.scribblemate.common.responses.SuccessResponse;
+import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

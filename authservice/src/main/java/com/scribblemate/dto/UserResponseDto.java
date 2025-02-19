@@ -1,7 +1,7 @@
 package com.scribblemate.dto;
 
 import java.time.LocalDateTime;
-import com.scribblemate.utility.Utils;
+import com.scribblemate.common.utility.Utils;
 import lombok.Getter;
 import lombok.Setter;
 

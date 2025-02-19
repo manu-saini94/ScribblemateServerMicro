@@ -1,9 +1,9 @@
 package com.scribblemate.aspect;
 
 import com.scribblemate.entities.User;
-import com.scribblemate.exceptions.UserNotFoundException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.repositories.UserRepository;
-import com.scribblemate.utility.ResponseErrorUtils;
+import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;

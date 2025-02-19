@@ -1,4 +1,4 @@
-package com.scribblemate.utility;
+package com.scribblemate.common.utility;
 
 public class UserUtils {
 	

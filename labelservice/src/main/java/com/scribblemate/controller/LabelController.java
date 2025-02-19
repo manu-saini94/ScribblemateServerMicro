@@ -2,14 +2,15 @@ package com.scribblemate.controller;
 
 import java.util.List;
 
-import com.scribblemate.utility.ResponseSuccessUtils;
+import com.scribblemate.configuration.UserContext;
+import com.scribblemate.entities.User;
+import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.scribblemate.dto.LabelDto;
-import com.scribblemate.responses.SuccessResponse;
+import com.scribblemate.common.responses.SuccessResponse;
 import com.scribblemate.services.LabelService;
 
 @RequestMapping("${labels.api.prefix}")
@@ -21,30 +22,33 @@ public class LabelController {
     private LabelService labelService;
 
     @PostMapping("/create")
-    public ResponseEntity<SuccessResponse> createLabel(@RequestBody LabelDto labelDto, @RequestHeader("userId") Long userId) {
-        LabelDto newLabelDto = labelService.createNewLabel(labelDto, userId);
+    public ResponseEntity<SuccessResponse> createLabel(@RequestBody LabelDto labelDto) {
+        User user = UserContext.getCurrentUser();
+        LabelDto newLabelDto = labelService.createNewLabel(labelDto, user.getId());
         return ResponseEntity.ok().body(
                 new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, newLabelDto));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<SuccessResponse> updateLabel(@RequestBody LabelDto labelDto, @RequestHeader("userId") Long userId) {
-        LabelDto updatedLabelDto = labelService.editLabel(labelDto, userId);
+    public ResponseEntity<SuccessResponse> updateLabel(@RequestBody LabelDto labelDto) {
+        User user = UserContext.getCurrentUser();
+        LabelDto updatedLabelDto = labelService.editLabel(labelDto, user.getId());
         return ResponseEntity.ok().body(
                 new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, updatedLabelDto));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<SuccessResponse> getAllLabelsByUser(@RequestHeader("userId") Long userId) {
-        List<LabelDto> labelList = labelService.getLabelsByUser(userId);
+    public ResponseEntity<SuccessResponse> getAllLabelsByUser() {
+        User user = UserContext.getCurrentUser();
+        List<LabelDto> labelList = labelService.getLabelsByUser(user.getId());
         return ResponseEntity.ok().body(
                 new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelList));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<SuccessResponse> deleteLabelByUser(@RequestParam("id") Long labelId,
-                                                             @RequestHeader("userId") Long userId) {
-        boolean isDeleted = labelService.deleteLabel(labelId, userId);
+    public ResponseEntity<SuccessResponse> deleteLabelByUser(@RequestParam("id") Long labelId) {
+        User user = UserContext.getCurrentUser();
+        boolean isDeleted = labelService.deleteLabel(labelId, user.getId());
         return ResponseEntity.ok()
                 .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_DELETE_SUCCESS, isDeleted));
     }

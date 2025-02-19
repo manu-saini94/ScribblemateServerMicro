@@ -1,10 +1,10 @@
 package com.scribblemate.exceptions.controller;
 
-import com.scribblemate.exceptions.TokenExpiredException;
-import com.scribblemate.exceptions.TokenMissingOrInvalidException;
-import com.scribblemate.exceptions.UserNotFoundException;
-import com.scribblemate.responses.ErrorResponse;
-import com.scribblemate.utility.ResponseErrorUtils;
+import com.scribblemate.common.exceptions.TokenExpiredException;
+import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.common.responses.ErrorResponse;
+import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;

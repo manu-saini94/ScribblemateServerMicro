@@ -1,4 +1,4 @@
-package com.scribblemate.utility;
+package com.scribblemate.common.utility;
 
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;

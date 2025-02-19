@@ -1,4 +1,4 @@
-package com.scribblemate.responses;
+package com.scribblemate.common.responses;
 
 
 public class ErrorResponse {

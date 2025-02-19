@@ -1,4 +1,4 @@
-package com.scribblemate.aspect;
+package com.scribblemate.configuration;
 
 import com.scribblemate.entities.User;
 

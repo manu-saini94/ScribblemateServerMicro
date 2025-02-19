@@ -1,4 +1,4 @@
-package com.scribblemate.exceptions;
+package com.scribblemate.common.exceptions;
 
 import lombok.Getter;
 import lombok.Setter;

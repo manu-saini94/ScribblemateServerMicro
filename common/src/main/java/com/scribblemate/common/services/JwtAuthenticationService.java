@@ -1,4 +1,4 @@
-package com.scribblemate.services;
+package com.scribblemate.common.services;
 
 import java.security.Key;
 import java.util.Date;

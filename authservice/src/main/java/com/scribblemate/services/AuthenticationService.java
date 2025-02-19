@@ -4,8 +4,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+
+import com.scribblemate.common.exceptions.TokenExpiredException;
+import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.common.services.EmailService;
+import com.scribblemate.common.services.JwtAuthenticationService;
 import com.scribblemate.exceptions.*;
-import com.scribblemate.utility.Utils;
+import com.scribblemate.common.utility.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;

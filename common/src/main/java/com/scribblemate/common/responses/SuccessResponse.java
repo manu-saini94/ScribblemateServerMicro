@@ -1,4 +1,4 @@
-package com.scribblemate.responses;
+package com.scribblemate.common.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

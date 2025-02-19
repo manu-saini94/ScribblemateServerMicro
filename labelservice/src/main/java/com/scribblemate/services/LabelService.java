@@ -3,7 +3,7 @@ package com.scribblemate.services;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import com.scribblemate.exceptions.UserNotFoundException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.exceptions.labels.*;
 import com.scribblemate.repositories.SpecificNoteRepository;
 import com.scribblemate.utility.LabelUtils;

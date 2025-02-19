@@ -20,7 +20,7 @@
     <artifactId>scribble-mate-micro</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>scribble-mate-micro</name>
-    <description>Scribblemate-note app-Spring Boot</description>
+    <description>Scribblemate notes application in Spring Boot</description>
     <url/>
     <licenses>
         <license/>

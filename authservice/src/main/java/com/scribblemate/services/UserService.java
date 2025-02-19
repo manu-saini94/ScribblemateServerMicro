@@ -2,9 +2,11 @@ package com.scribblemate.services;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.scribblemate.common.services.JwtAuthenticationService;
 import com.scribblemate.exceptions.UserNotDeletedException;
-import com.scribblemate.exceptions.UserNotFoundException;
-import com.scribblemate.utility.Utils;
+import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.common.utility.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.scribblemate.dto.CollaboratorDto;

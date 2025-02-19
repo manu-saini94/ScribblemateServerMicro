@@ -2,7 +2,7 @@ package com.scribblemate.controller;
 
 import com.scribblemate.annotation.LoadUserContext;
 import com.scribblemate.aspect.UserContext;
-import com.scribblemate.utility.ResponseSuccessUtils;
+import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,7 +17,7 @@ import com.scribblemate.dto.LoginDto;
 import com.scribblemate.dto.RegistrationDto;
 import com.scribblemate.dto.UserResponseDto;
 import com.scribblemate.entities.User;
-import com.scribblemate.responses.SuccessResponse;
+import com.scribblemate.common.responses.SuccessResponse;
 import com.scribblemate.services.AuthenticationService;
 import com.scribblemate.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;

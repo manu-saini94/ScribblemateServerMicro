@@ -1,4 +1,4 @@
-package com.scribblemate.utility;
+package com.scribblemate.common.utility;
 
 public enum ResponseErrorUtils {
 	DESCRIPTION("description"), NOTE_PERSIST_ERROR("Error occurred while persisting note"),
