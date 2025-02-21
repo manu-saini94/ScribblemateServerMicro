@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
@@ -37,28 +36,22 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationService {
 
     private Random random = new Random(1000);
-
     @Value("${security.jwt.refresh-expiration-time}")
     private Long refreshTokenDurationMs;
-
     @Value("${security.jwt.access-expiration-time}")
     private Long accessTokenDurationMs;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private EmailService emailService;
-
     @Autowired
     private JwtAuthenticationService jwtService;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private KafkaService kafkaService;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -70,7 +63,10 @@ public class AuthenticationService {
         try {
             newUser = new User().setFullName(input.getFullName()).setEmail(input.getEmail())
                     .setPassword(passwordEncoder.encode(input.getPassword())).setStatus(Utils.Status.ACTIVE);
-            return userRepository.save(newUser);
+            User user = userRepository.save(newUser);
+            // Kafka event for user created
+            kafkaService.publishUserCreatedEvent(user);
+            return user;
         } catch (Exception exp) {
             log.error(UserUtils.ERROR_PERSISTING_USER, newUser);
             throw new RegistrationException();
