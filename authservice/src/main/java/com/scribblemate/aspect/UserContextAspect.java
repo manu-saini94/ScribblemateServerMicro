@@ -4,6 +4,7 @@ import com.scribblemate.entities.User;
 import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.repositories.UserRepository;
 import com.scribblemate.common.utility.ResponseErrorUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@Slf4j
 public class UserContextAspect {
 
     @Autowired
@@ -35,6 +37,7 @@ public class UserContextAspect {
             User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("User not found with this email : " + userEmail));
             UserContext.setCurrentUser(user);
         }else{
+            log.error(ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS.getMessage());
             throw new AccessDeniedException(ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS.getMessage());
         }
     }
