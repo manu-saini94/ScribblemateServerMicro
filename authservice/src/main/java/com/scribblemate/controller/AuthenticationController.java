@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.scribblemate.dto.LoginDto;
 import com.scribblemate.dto.RegistrationDto;
-import com.scribblemate.dto.UserResponseDto;
+import com.scribblemate.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.common.responses.SuccessResponse;
 import com.scribblemate.services.AuthenticationService;
@@ -38,9 +38,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegistrationDto registerDto) {
+    public ResponseEntity<SuccessResponse> register(@RequestBody RegistrationDto registerDto) {
         User registeredUser = authenticationService.signUp(registerDto);
-        return ResponseEntity.ok(registeredUser);
+        UserDto userResponseDto = userService.getUserDtoFromUser(registeredUser);
+        return ResponseEntity.ok().body(
+                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_REGISTRATION_SUCCESS, userResponseDto));
     }
 
     @PostMapping("/forgot")
@@ -53,7 +55,7 @@ public class AuthenticationController {
     public ResponseEntity<SuccessResponse> authenticate(@RequestBody LoginDto loginUserDto,
                                                         HttpServletResponse response) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto, response);
-        UserResponseDto userResponseDto = userService.getUserDtoFromUser(authenticatedUser);
+        UserDto userResponseDto = userService.getUserDtoFromUser(authenticatedUser);
         return ResponseEntity.ok().body(
                 new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_LOGIN_SUCCESS, userResponseDto));
     }
@@ -62,7 +64,7 @@ public class AuthenticationController {
     @PostMapping("/refresh-token")
     public ResponseEntity<SuccessResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         User authUser = authenticationService.refreshAuthToken(request, response);
-        UserResponseDto userResponseDto = userService.getUserDtoFromUser(authUser);
+        UserDto userResponseDto = userService.getUserDtoFromUser(authUser);
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK.value(),
                 ResponseSuccessUtils.TOKEN_REFRESH_SUCCESS, userResponseDto));
     }
@@ -71,7 +73,7 @@ public class AuthenticationController {
     @GetMapping("/validate")
     public ResponseEntity<SuccessResponse> validateUser() {
         User user = UserContext.getCurrentUser();
-        UserResponseDto userResponseDto = userService.getUserDtoFromUser(user);
+        UserDto userResponseDto = userService.getUserDtoFromUser(user);
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK.value(),
                 ResponseSuccessUtils.USER_VALIDATION_SUCCESS, userResponseDto));
     }

@@ -1,45 +1,30 @@
 package com.scribblemate.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class RegistrationDto {
-	private String email;
+    private String email;
 
-	private String password;
+    private String password;
 
-	private String fullName;
+    private String fullName;
 
-	public RegistrationDto() {
-		super();
-	}
+    private String profilePicture;
 
-	public RegistrationDto(String email, String password, String fullName) {
-		super();
-		this.email = email;
-		this.password = password;
-		this.fullName = fullName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getFullName() {
-		return fullName;
-	}
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
-
+    @Override
+    public String toString() {
+        return "RegistrationDto{" +
+                "email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", profilePicture='" + profilePicture + '\'' +
+                '}';
+    }
 }

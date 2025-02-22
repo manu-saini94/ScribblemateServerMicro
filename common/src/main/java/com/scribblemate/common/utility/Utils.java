@@ -49,20 +49,20 @@ public class Utils {
 
     public enum KafkaEvent {
         // User events
-        USER_CREATED("user_created"),
-        USER_UPDATED("user_updated"),
-        USER_DELETED("user_deleted"),
+        USER_CREATED("USER_CREATED"),
+        USER_UPDATED("USER_UPDATED"),
+        USER_DELETED("USER_DELETED"),
 
 
         // Note events
-        NOTE_CREATED("note_created"),
-        NOTE_UPDATED("note_updated"),
-        NOTE_DELETED("note_deleted"),
+        NOTE_CREATED("NOTE_CREATED"),
+        NOTE_UPDATED("NOTE_UPDATED"),
+        NOTE_DELETED("NOTE_DELETED"),
 
         // Label events
-        LABEL_CREATED("label_created"),
-        LABEL_UPDATED("label_updated"),
-        LABEL_DELETED("label_deleted");
+        LABEL_CREATED("LABEL_CREATED"),
+        LABEL_UPDATED("LABEL_UPDATED"),
+        LABEL_DELETED("LABEL_DELETED");
 
         private final String value;
 
