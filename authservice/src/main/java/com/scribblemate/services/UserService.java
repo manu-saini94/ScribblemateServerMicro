@@ -4,13 +4,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.scribblemate.common.services.JwtAuthenticationService;
+import com.scribblemate.common.utility.ResponseErrorUtils;
+import com.scribblemate.common.utility.ResponseSuccessUtils;
+import com.scribblemate.dto.RegistrationDto;
 import com.scribblemate.exceptions.UserNotDeletedException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.common.utility.Utils;
+import com.scribblemate.exceptions.UserNotUpdatedException;
+import com.scribblemate.exceptions.UsersFetchException;
+import com.scribblemate.utility.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.scribblemate.dto.CollaboratorDto;
-import com.scribblemate.dto.UserResponseDto;
+import com.scribblemate.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,49 +32,93 @@ public class UserService {
     @Autowired
     private JwtAuthenticationService jwtService;
 
-    public List<UserResponseDto> getAllUsers() {
-        List<User> users = (List<User>) userRepository.findAll();
-        List<UserResponseDto> usersDtoList = users.stream().map(user -> getUserDtoFromUser(user))
-                .collect(Collectors.toList());
-        return usersDtoList;
+    @Autowired
+    private KafkaService kafkaService;
+
+    public List<UserDto> getAllUsers() {
+        try {
+            List<User> users = (List<User>) userRepository.findAll();
+            List<UserDto> usersDtoList = users.stream().map(user -> getUserDtoFromUser(user))
+                    .collect(Collectors.toList());
+            log.info(ResponseSuccessUtils.FETCH_ALL_USERS_SUCCESS);
+            return usersDtoList;
+        } catch (Exception e) {
+            log.error(ResponseErrorUtils.FETCH_ALL_USERS_ERROR.getMessage());
+            throw new UsersFetchException(e.getMessage());
+        }
     }
 
+    @Transactional
+    public UserDto updateUserDetails(UserDto userDto, User currentUser) {
+        try {
+            User user = userRepository.findByEmail(currentUser.getEmail())
+                    .orElseThrow(() -> new UserNotFoundException());
+            user.setFullName(userDto.getFullName());
+            user.setProfilePicture(userDto.getProfilePicture());
+            User savedUser = userRepository.save(user);
+            UserDto userDetailsDto = getUserDtoFromUser(savedUser);
+            log.info(ResponseSuccessUtils.USER_PERSIST_SUCCESS);
+            kafkaService.publishUserUpdatedEvent(savedUser);
+            return userDetailsDto;
+        } catch (Exception exp) {
+            log.error(UserUtils.ERROR_PERSISTING_USER, currentUser, exp.getMessage());
+            throw new UserNotUpdatedException(exp.getMessage());
+        }
+    }
+
+
+    @Transactional
+    public UserDto deactivateUser(User currentUser) {
+        try {
+            User user = userRepository.findByEmail(currentUser.getEmail())
+                    .orElseThrow(() -> new UserNotFoundException());
+            user.setStatus(Utils.Status.INACTIVE);
+            User savedUser = userRepository.save(user);
+            UserDto userDetailsDto = getUserDtoFromUser(savedUser);
+            log.info(ResponseSuccessUtils.USER_DEACTIVATE_SUCCESS);
+            kafkaService.publishUserUpdatedEvent(savedUser);
+            return userDetailsDto;
+        } catch (Exception exp) {
+            log.error(UserUtils.ERROR_PERSISTING_USER, currentUser, exp.getMessage());
+            throw new UserNotUpdatedException(exp.getMessage());
+        }
+    }
+
+    @Transactional
+    public UserDto activateUser(User currentUser) {
+        try {
+            User user = userRepository.findByEmail(currentUser.getEmail())
+                    .orElseThrow(() -> new UserNotFoundException());
+            user.setStatus(Utils.Status.ACTIVE);
+            User savedUser = userRepository.save(user);
+            UserDto userDetailsDto = getUserDtoFromUser(savedUser);
+            log.info(ResponseSuccessUtils.USER_ACTIVATE_SUCCESS);
+            kafkaService.publishUserUpdatedEvent(savedUser);
+            return userDetailsDto;
+        } catch (Exception exp) {
+            log.error(UserUtils.ERROR_PERSISTING_USER, currentUser, exp.getMessage());
+            throw new UserNotUpdatedException(exp.getMessage());
+        }
+    }
 
     @Transactional
     public boolean deleteUser(User currentUser) {
         try {
             User user = userRepository.findByEmail(currentUser.getEmail())
                     .orElseThrow(() -> new UserNotFoundException());
-//			if (!user.getLabelSet().isEmpty()) {
-//				user.getLabelSet().forEach(label -> specificNoteRepository.deleteLabelsFromLabelNote(label.getId()));
-//			}
-//			labelRepository.deleteAllByUser(user);
-//			user.getNoteList().forEach(note -> {
-//				if (!note.getCollaboratorList().isEmpty()) {
-//					List<User> userList = note.getCollaboratorList().stream().filter(item -> !item.equals(user))
-//							.toList();
-//					note.setCollaboratorList(userList);
-//				}
-//				if (!note.getSpecificNoteList().isEmpty()) {
-//					List<SpecificNote> noteList = note.getSpecificNoteList().stream()
-//							.filter(item -> !item.getUser().equals(user)).toList();
-//					note.setSpecificNoteList(noteList);
-//				}
-//				noteRepository.save(note);
-//			});
-//			user.getLabelSet().clear();
-            user.setStatus(Utils.Status.INACTIVE);
-            userRepository.save(user);
+            userRepository.delete(user);
+            log.info(ResponseSuccessUtils.USER_DELETE_SUCCESS);
+            kafkaService.publishUserDeletedEvent(user);
             return true;
         } catch (Exception exp) {
-            // TODO Auto-generated catch block
-//			log.error(NoteUtils.ERROR_DELETING_USER, exp);
+            log.error(UserUtils.ERROR_DELETING_USER, currentUser, exp.getMessage());
             throw new UserNotDeletedException(exp.getMessage());
         }
     }
 
-    public UserResponseDto getUserDtoFromUser(User user) {
-        UserResponseDto userDto = new UserResponseDto();
+
+    public UserDto getUserDtoFromUser(User user) {
+        UserDto userDto = new UserDto();
         userDto.setId(user.getId());
         userDto.setEmail(user.getEmail());
         userDto.setFullName(user.getFullName());

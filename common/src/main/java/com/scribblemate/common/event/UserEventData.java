@@ -1,4 +1,4 @@
-package com.scribblemate.user.event;
+package com.scribblemate.common.event;
 
 import com.scribblemate.common.utility.Utils;
 import lombok.*;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserCreatedEvent {
+public class UserEventData {
     private Long id;
 
     private String fullName;

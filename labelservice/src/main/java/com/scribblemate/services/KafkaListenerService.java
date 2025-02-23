@@ -16,27 +16,21 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class KafkaListenerService {
-
     @Autowired
     private UserService userService;
 
-    @RetryableTopic(attempts = "3",backoff = @Backoff(delay=1000,multiplier = 1))
+    @RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 1))
     @KafkaListener(topics = "USER_CREATED", groupId = "${spring.kafka.consumer.group-id}")
     public void listenForUserCreation(@Payload UserEventData userEventData) {
         log.info("Message received from " + Utils.KafkaEvent.USER_CREATED.getValue() + " topic => {}", userEventData);
         userService.persistUserAfterEvent(userEventData);
     }
 
-    @RetryableTopic(attempts = "3",backoff = @Backoff(delay=1000,multiplier = 1))
-    @KafkaListener(topics = "USER_UPDATED", groupId = "${spring.kafka.consumer.group-id}")
-    public void listenForUserUpdation(@Payload UserEventData userEventData) {
-        log.info("Message received from " + Utils.KafkaEvent.USER_UPDATED.getValue() + " topic => {}", userEventData);
-        userService.updateUserAfterEvent(userEventData);
-    }
-    @RetryableTopic(attempts = "3",backoff = @Backoff(delay=1000,multiplier = 1))
+    @RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000, multiplier = 1))
     @KafkaListener(topics = "USER_DELETED", groupId = "${spring.kafka.consumer.group-id}")
     public void listenForUserDeletion(@Payload UserEventData userEventData) {
         log.info("Message received from " + Utils.KafkaEvent.USER_DELETED.getValue() + " topic => {}", userEventData);
         userService.deleteUserAfterEvent(userEventData);
     }
+
 }
