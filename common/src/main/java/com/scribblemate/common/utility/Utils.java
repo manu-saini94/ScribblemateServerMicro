@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class Utils {
 
+    public static final String KAFKA_TYPE_ID = "__TypeId__";
+
     public enum Role {
         OWNER, COLLABORATOR;
 
@@ -39,6 +41,21 @@ public class Utils {
         private final String value;
 
         TokenType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    public enum KafkaTopicTypeId {
+        USER("user"),
+        NOTE("note"),
+        LABEL("label");
+        private final String value;
+
+        KafkaTopicTypeId(String value) {
             this.value = value;
         }
 

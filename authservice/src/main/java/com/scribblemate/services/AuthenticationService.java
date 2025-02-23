@@ -9,6 +9,7 @@ import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.common.services.EmailService;
 import com.scribblemate.common.services.JwtAuthenticationService;
+import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.exceptions.*;
 import com.scribblemate.common.utility.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class AuthenticationService {
             newUser = new User().setFullName(input.getFullName()).setEmail(input.getEmail())
                     .setPassword(passwordEncoder.encode(input.getPassword())).setStatus(Utils.Status.ACTIVE);
             User user = userRepository.save(newUser);
-            // Kafka event for user created
+            log.info(ResponseSuccessUtils.USER_REGISTRATION_SUCCESS);
             kafkaService.publishUserCreatedEvent(user);
             return user;
         } catch (Exception exp) {
