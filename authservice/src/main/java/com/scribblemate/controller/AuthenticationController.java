@@ -5,6 +5,8 @@ import com.scribblemate.aspect.UserContext;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.scribblemate.dto.LoginDto;
 import com.scribblemate.dto.RegistrationDto;
-import com.scribblemate.dto.UserDto;
+import com.scribblemate.common.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.common.responses.SuccessResponse;
 import com.scribblemate.services.AuthenticationService;
@@ -38,11 +40,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SuccessResponse> register(@RequestBody RegistrationDto registerDto) {
+    public ResponseEntity<SuccessResponse<UserDto>> register(@RequestBody RegistrationDto registerDto) {
         User registeredUser = authenticationService.signUp(registerDto);
         UserDto userResponseDto = userService.getUserDtoFromUser(registeredUser);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_REGISTRATION_SUCCESS, userResponseDto));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_REGISTRATION_SUCCESS, userResponseDto));
     }
 
     @PostMapping("/forgot")
@@ -52,38 +54,47 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<SuccessResponse> authenticate(@RequestBody LoginDto loginUserDto,
+    public ResponseEntity<SuccessResponse<UserDto>> authenticate(@RequestBody LoginDto loginUserDto,
                                                         HttpServletResponse response) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto, response);
         UserDto userResponseDto = userService.getUserDtoFromUser(authenticatedUser);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_LOGIN_SUCCESS, userResponseDto));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_LOGIN_SUCCESS, userResponseDto));
     }
 
     @LoadUserContext
     @PostMapping("/refresh-token")
-    public ResponseEntity<SuccessResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<SuccessResponse<UserDto>> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         User authUser = authenticationService.refreshAuthToken(request, response);
         UserDto userResponseDto = userService.getUserDtoFromUser(authUser);
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK.value(),
+        return ResponseEntity.ok().body(new SuccessResponse<>(HttpStatus.OK.value(),
                 ResponseSuccessUtils.TOKEN_REFRESH_SUCCESS, userResponseDto));
     }
 
     @LoadUserContext
     @GetMapping("/validate")
-    public ResponseEntity<SuccessResponse> validateUser() {
+    public ResponseEntity<SuccessResponse<UserDto>> validateUser() {
         User user = UserContext.getCurrentUser();
         UserDto userResponseDto = userService.getUserDtoFromUser(user);
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK.value(),
+        return ResponseEntity.ok().body(new SuccessResponse<>(HttpStatus.OK.value(),
                 ResponseSuccessUtils.USER_VALIDATION_SUCCESS, userResponseDto));
     }
 
     @LoadUserContext
-    @DeleteMapping("/logout")
-    public ResponseEntity<SuccessResponse> logoutUser(HttpServletRequest request, HttpServletResponse response) {
-        authenticationService.logoutAuthUser(request, response);
+    @PostMapping("/logout")
+    public ResponseEntity<SuccessResponse<Boolean>> logoutUser(HttpServletRequest request, HttpServletResponse response) {
+        boolean isLoggedOut = authenticationService.logoutAuthUser(request, response);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_LOGOUT_SUCCESS, true));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_LOGOUT_SUCCESS, isLoggedOut));
+    }
+
+    @GetMapping("/authenticate")
+    public ResponseEntity<SuccessResponse<UserDto>> authenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        UserDto userDto = userService.getUserDtoFromUser(currentUser);
+        return ResponseEntity.ok().body(
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_AUTHENTICATION_SUCCESS, userDto));
     }
 
 }

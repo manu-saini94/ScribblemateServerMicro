@@ -1,15 +1,17 @@
 package com.scribblemate.configuration;
 
 import java.io.IOException;
-import com.scribblemate.entities.User;
+
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
-import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.entities.User;
 import com.scribblemate.repositories.UserRepository;
-import com.scribblemate.common.services.JwtAuthenticationService;
 import com.scribblemate.common.utility.Utils;
+import com.scribblemate.services.JwtAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -58,10 +60,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } else {
                 throw new TokenMissingOrInvalidException("Cookies are missing from the request");
             }
-            String userEmail = jwtService.extractUsername(accessTokenString);
-            User user = userRepository.findByEmail(userEmail).orElseThrow(() ->
-                    new UserNotFoundException("User not found with email : " + userEmail));
-            UserContext.setCurrentUser(user);
+            Long userId = jwtService.extractUserId(accessTokenString);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (userId != null && authentication == null){
+                User user = new User();
+                user.setId(userId);
+//                SecurityContextHolder.getContext().setAuthentication(user);
+            }
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);

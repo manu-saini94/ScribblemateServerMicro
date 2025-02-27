@@ -1,4 +1,4 @@
-package com.scribblemate.dto;
+package com.scribblemate.common.dto;
 
 import java.time.LocalDateTime;
 import com.scribblemate.common.utility.Utils;

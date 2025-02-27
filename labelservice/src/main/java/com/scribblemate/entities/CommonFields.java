@@ -1,4 +1,4 @@
-package com.scribblemate.common.entities;
+package com.scribblemate.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

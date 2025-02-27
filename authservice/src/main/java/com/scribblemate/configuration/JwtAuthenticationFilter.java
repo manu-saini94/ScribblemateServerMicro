@@ -4,11 +4,12 @@ import java.io.IOException;
 
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
-import com.scribblemate.common.services.JwtAuthenticationService;
-import com.scribblemate.utility.UserUtils;
+import com.scribblemate.services.JwtAuthenticationService;
+import com.scribblemate.common.utility.UserUtils;
 import com.scribblemate.common.utility.Utils;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,7 +28,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+@Order(2)
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

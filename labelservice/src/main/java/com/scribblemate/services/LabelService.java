@@ -1,9 +1,6 @@
 package com.scribblemate.services;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.exceptions.labels.*;
 import com.scribblemate.repositories.SpecificNoteRepository;
 import com.scribblemate.utility.LabelUtils;
@@ -11,18 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.scribblemate.dto.LabelDto;
 import com.scribblemate.entities.Label;
-import com.scribblemate.entities.User;
 import com.scribblemate.repositories.LabelRepository;
-import com.scribblemate.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class LabelService {
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private LabelRepository labelRepository;
@@ -32,26 +24,16 @@ public class LabelService {
 
     @Transactional
     public LabelDto createNewLabel(LabelDto labelDto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         try {
-            Set<Label> labelSet = user.getLabelSet();
             Label label = new Label();
             label.setLabelName(labelDto.getLabelName());
             label.setImportant(labelDto.isImportant());
-            label.setUser(user);
-            if (labelSet == null) {
-                labelSet = new HashSet<>();
-                labelSet.add(label);
-                user.setLabelSet(labelSet);
-            } else {
-                boolean alreadyExist = labelSet.stream()
-                        .anyMatch(labelItem -> labelItem.getLabelName().equalsIgnoreCase(labelDto.getLabelName()));
-                if (alreadyExist) {
+            label.setUserId(userId);
+            Label foundLabel = labelRepository.findByUserIdAndLabelName(userId,labelDto.getLabelName());
+                if (foundLabel!=null) {
                     log.error(LabelUtils.LABEL_ALREADY_EXIST_ERROR, label);
                     throw new LabelAlreadyExistException();
                 }
-                labelSet.add(label);
-            }
             Label savedLabel = labelRepository.save(label);
             log.info(LabelUtils.LABEL_PERSIST_SUCCESS, savedLabel);
             return getLabelDtoFromLabel(savedLabel);
@@ -63,10 +45,9 @@ public class LabelService {
 
     @Transactional
     public boolean deleteLabel(Long labelId, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         try {
             specificNoteRepository.deleteLabelsFromLabelNote(labelId);
-            labelRepository.deleteByIdAndUser(labelId, user.getId());
+            labelRepository.deleteByIdAndUser(labelId, userId);
             log.info(LabelUtils.LABEL_DELETE_SUCCESS, labelId);
             return true;
         } catch (Exception ex) {
@@ -77,9 +58,9 @@ public class LabelService {
 
     @Transactional
     public LabelDto editLabel(LabelDto labelDto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+
         try {
-            Label label = labelRepository.findByIdAndUser(labelDto.getId(), user);
+            Label label = labelRepository.findByUserIdAndLabelName(userId,labelDto.getLabelName());
             label.setLabelName(labelDto.getLabelName());
             label.setImportant(labelDto.isImportant());
             Label savedLabel = labelRepository.save(label);
@@ -93,17 +74,13 @@ public class LabelService {
 
     @Transactional
     public List<LabelDto> getLabelsByUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
-
         try {
-            List<Label> labelList = labelRepository.findAllByUserOrderByLabelName(user);
-            List<LabelDto> labelDtoList = labelList.stream().map(label -> {
-                return getLabelDtoFromLabel(label);
-            }).toList();
-            log.info(LabelUtils.LABEL_FETCH_SUCCESS, user.getId());
+            List<Label> labelList = labelRepository.findAllByUserIdOrderByLabelName(userId);
+            List<LabelDto> labelDtoList = labelList.stream().map(label -> getLabelDtoFromLabel(label)).toList();
+            log.info(LabelUtils.LABEL_FETCH_SUCCESS,userId);
             return labelDtoList;
         } catch (Exception ex) {
-            log.error(LabelUtils.LABEL_FETCH_ERROR, user.getId(), new LabelsNotFoundException(ex.getMessage()));
+            log.error(LabelUtils.LABEL_FETCH_ERROR, userId, new LabelsNotFoundException(ex.getMessage()));
             throw new LabelsNotFoundException(ex.getMessage());
         }
     }

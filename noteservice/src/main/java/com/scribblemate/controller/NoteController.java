@@ -32,101 +32,101 @@ public class NoteController {
     private NoteService noteService;
 
     @PostMapping("/create")
-    public ResponseEntity<SuccessResponse> createNote(@RequestBody NoteDto notedto) {
+    public ResponseEntity<SuccessResponse<NoteDto>> createNote(@RequestBody NoteDto notedto) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.createNewNote(notedto, user);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_PERSIST_SUCCESS, note));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_PERSIST_SUCCESS, note));
     }
 
     @PostMapping("/add/label")
-    public ResponseEntity<SuccessResponse> addLabelToNote(@RequestParam("labelId") Long labelId,
+    public ResponseEntity<SuccessResponse<NoteDto>> addLabelToNote(@RequestParam("labelId") Long labelId,
                                                           @RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.addLabelToNote(user, noteId, labelId);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
     }
 
     @DeleteMapping("/delete/label")
-    public ResponseEntity<SuccessResponse> removeLabelFromNote(@RequestParam("noteId") Long noteId,
+    public ResponseEntity<SuccessResponse<NoteDto>> removeLabelFromNote(@RequestParam("noteId") Long noteId,
                                                                @RequestParam("labelId") Long labelId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.deleteLabelFromNote(user, noteId, labelId);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.COLLABORATOR_DELETE_SUCCESS, note));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.COLLABORATOR_DELETE_SUCCESS, note));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<SuccessResponse> getAllNotes() {
+    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesForUser(user);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
     @GetMapping("/label")
-    public ResponseEntity<SuccessResponse> getNotesByLabel(@RequestParam("labelId") Long labelId) {
+    public ResponseEntity<SuccessResponse<List<NoteDto>>> getNotesByLabel(@RequestParam("labelId") Long labelId) {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getNotesByUserAndLabelId(user, labelId);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
     @GetMapping("/label/all")
-    public ResponseEntity<SuccessResponse> getAllNotesByLabelIds() {
+    public ResponseEntity<SuccessResponse<Map<Long, List<Long>>>> getAllNotesByLabelIds() {
         User user = UserContext.getCurrentUser();
         Map<Long, List<Long>> notesMap = noteService.getAllNotesByUserAndLabelIds(user);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesMap));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesMap));
     }
 
     @GetMapping("/labelled")
-    public ResponseEntity<SuccessResponse> getAllNotesWithLabels() {
+    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllNotesWithLabels() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesWithLabelsByUser(user);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
     @GetMapping("/get")
-    public ResponseEntity<SuccessResponse> getNote(@RequestParam("noteId") Long noteId) {
+    public ResponseEntity<SuccessResponse<NoteDto>> getNote(@RequestParam("noteId") Long noteId) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.getNoteById(user, noteId);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, note));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, note));
     }
 
     @GetMapping("/get/trash")
-    public ResponseEntity<SuccessResponse> getAllTrashedNotes() {
+    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllTrashedNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesByIsTrashed(user);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
     @GetMapping("/get/archive")
-    public ResponseEntity<SuccessResponse> getAllArchivedNotes() {
+    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllArchivedNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesByIsArchived(user);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
     @GetMapping("/get/reminder")
-    public ResponseEntity<SuccessResponse> getAllReminderNotes() {
+    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllReminderNotes() {
         User user = UserContext.getCurrentUser();
         List<NoteDto> notesList = noteService.getAllNotesByReminder(user);
         return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<SuccessResponse> updateNote(@RequestBody NoteDto notedto) {
+    public ResponseEntity<SuccessResponse<NoteDto>> updateNote(@RequestBody NoteDto notedto) {
         User user = UserContext.getCurrentUser();
         NoteDto note = noteService.updateExistingNote(notedto, user);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
     }
 
     @PutMapping("/update/pin")
