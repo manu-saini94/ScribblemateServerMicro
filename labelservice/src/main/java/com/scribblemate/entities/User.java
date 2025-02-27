@@ -1,30 +1,62 @@
 package com.scribblemate.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import java.util.Collection;
 
-import java.util.Set;
-
-@Entity
-@Table(name = "users")
 @Getter
 @Setter
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class User {
+public class User implements Authentication {
 
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false)
     private Long id;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE}, orphanRemoval = true)
-    private Set<Label> labelSet;
+    private boolean authenticated = false;
 
-    public User(Long id) {
+    public Long getId() {
+        return id;
+    }
+
+    public User setId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return null;
+    }
+
+    @Override
+    public Object getDetails() {
+        return null;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return this;
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        return false;
+    }
+
+    @Override
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+        this.authenticated = isAuthenticated;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }

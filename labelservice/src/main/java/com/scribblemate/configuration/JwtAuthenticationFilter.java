@@ -2,16 +2,14 @@ package com.scribblemate.configuration;
 
 import java.io.IOException;
 
-import com.scribblemate.entities.User;
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
-import com.scribblemate.repositories.UserRepository;
-import com.scribblemate.common.services.JwtAuthenticationService;
-import com.scribblemate.common.utility.ResponseErrorUtils;
 import com.scribblemate.common.utility.Utils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.scribblemate.entities.User;
+import com.scribblemate.services.JwtAuthenticationService;
 import org.springframework.lang.NonNull;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,9 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     private final JwtAuthenticationService jwtService;
-
-    @Autowired
-    private UserRepository userRepository;
 
     public JwtAuthenticationFilter(HandlerExceptionResolver handlerExceptionResolver,
                                    JwtAuthenticationService jwtService, UserDetailsService userDetailsService) {
@@ -61,9 +56,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new TokenMissingOrInvalidException("Cookies are missing from the request");
             }
             Long userId = jwtService.extractUserId(accessTokenString);
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new AccessDeniedException(ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS.getMessage()));
-            UserContext.setCurrentUser(user);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (userId != null && authentication == null){
+                User user = new User();
+                user.setId(userId);
+                SecurityContextHolder.getContext().setAuthentication(user);
+            }
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);

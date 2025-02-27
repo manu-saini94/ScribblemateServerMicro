@@ -2,7 +2,6 @@ package com.scribblemate.entities;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import com.scribblemate.common.entities.CommonFields;
 import com.scribblemate.common.utility.Utils;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.fasterxml.jackson.annotation.JsonProperty;

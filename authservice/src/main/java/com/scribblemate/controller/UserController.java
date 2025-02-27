@@ -5,19 +5,15 @@ import java.util.List;
 import com.scribblemate.annotation.LoadUserContext;
 import com.scribblemate.aspect.UserContext;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
-import com.scribblemate.dto.RegistrationDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.scribblemate.dto.CollaboratorDto;
-import com.scribblemate.dto.UserDto;
+import com.scribblemate.common.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.common.responses.SuccessResponse;
 import com.scribblemate.services.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @LoadUserContext
@@ -28,59 +24,50 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/authenticate")
-    public ResponseEntity<SuccessResponse> authenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        UserDto userDto = userService.getUserDtoFromUser(currentUser);
-        return ResponseEntity.ok().body(
-                new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_AUTHENTICATION_SUCCESS, userDto));
-    }
-
     @GetMapping("/all")
-    public ResponseEntity<SuccessResponse> allUsers() {
+    public ResponseEntity<SuccessResponse<List<UserDto>>> allUsers() {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.FETCH_ALL_USERS_SUCCESS, users));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.FETCH_ALL_USERS_SUCCESS, users));
     }
 
     @GetMapping("/exist/{email}")
-    public ResponseEntity<SuccessResponse> checkCollaboratorExist(@PathVariable String email) {
+    public ResponseEntity<SuccessResponse<CollaboratorDto>> checkCollaboratorExist(@PathVariable String email) {
         CollaboratorDto collaboratorDto = userService.checkForUserExist(email);
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK.value(),
+        return ResponseEntity.ok().body(new SuccessResponse<>(HttpStatus.OK.value(),
                 ResponseSuccessUtils.CHECK_COLLABORATOR_EXIST_SUCCESS, collaboratorDto));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<SuccessResponse> deleteUser() {
+    public ResponseEntity<SuccessResponse<Boolean>> deleteUser() {
         User user = UserContext.getCurrentUser();
         boolean isDeleted = userService.deleteUser(user);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_DELETE_SUCCESS, isDeleted));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_DELETE_SUCCESS, isDeleted));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<SuccessResponse> updateUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<SuccessResponse<UserDto>> updateUser(@RequestBody UserDto userDto) {
         User user = UserContext.getCurrentUser();
         UserDto userDetailsDto = userService.updateUserDetails(userDto, user);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
     }
 
     @PutMapping("/activate")
-    public ResponseEntity<SuccessResponse> activateUser() {
+    public ResponseEntity<SuccessResponse<UserDto>> activateUser() {
         User user = UserContext.getCurrentUser();
         UserDto userDetailsDto = userService.activateUser(user);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
     }
 
     @PutMapping("/deactivate")
-    public ResponseEntity<SuccessResponse> deactivateUser() {
+    public ResponseEntity<SuccessResponse<UserDto>> deactivateUser() {
         User user = UserContext.getCurrentUser();
         UserDto userDetailsDto = userService.deactivateUser(user);
         return ResponseEntity.ok()
-                .body(new SuccessResponse(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
     }
 
 }

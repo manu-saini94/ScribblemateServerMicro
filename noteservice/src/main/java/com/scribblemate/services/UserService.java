@@ -11,6 +11,7 @@ import com.scribblemate.repositories.SpecificNoteRepository;
 import com.scribblemate.repositories.UserRepository;
 import com.scribblemate.common.utility.EventUtils;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,19 +20,17 @@ import java.util.List;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private SpecificNoteRepository specificNoteRepository;
+    private final SpecificNoteRepository specificNoteRepository;
 
-    @Autowired
-    private NoteRepository noteRepository;
+    private final NoteRepository noteRepository;
 
-    @Autowired
-    private LabelRepository labelRepository;
+    private final LabelRepository labelRepository;
+
     @Transactional
     public User setUserFromUserEvent(UserEventData userEventData) {
         User user = new User();
@@ -41,6 +40,7 @@ public class UserService {
         user.setId(userEventData.getId());
         return user;
     }
+
     @Transactional
     public void persistUserAfterEvent(UserEventData userEventData) {
         try {
@@ -52,6 +52,7 @@ public class UserService {
             throw new KafkaEventException(EventUtils.USER_PERSIST_ERROR_EVENT, exp);
         }
     }
+
     @Transactional
     public void updateUserAfterEvent(UserEventData userEventData) {
         try {
@@ -67,6 +68,7 @@ public class UserService {
             throw new KafkaEventException(EventUtils.USER_UPDATE_ERROR_EVENT, exp);
         }
     }
+
     @Transactional
     public void deleteUserAfterEvent(UserEventData userEventData) {
         try {

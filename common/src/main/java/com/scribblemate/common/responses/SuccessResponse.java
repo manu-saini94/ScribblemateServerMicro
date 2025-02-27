@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SuccessResponse {
+public class SuccessResponse<T> {
 	private int messagecode;
 	private String message;
-	private Object object;
+	private T data;
 
 }

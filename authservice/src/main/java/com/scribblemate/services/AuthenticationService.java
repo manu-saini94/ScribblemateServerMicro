@@ -8,7 +8,6 @@ import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.common.services.EmailService;
-import com.scribblemate.common.services.JwtAuthenticationService;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.exceptions.*;
 import com.scribblemate.common.utility.Utils;
@@ -26,7 +25,7 @@ import com.scribblemate.dto.LoginDto;
 import com.scribblemate.dto.RegistrationDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.UserRepository;
-import com.scribblemate.utility.UserUtils;
+import com.scribblemate.common.utility.UserUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -66,7 +65,7 @@ public class AuthenticationService {
                     .setPassword(passwordEncoder.encode(input.getPassword())).setStatus(Utils.Status.ACTIVE);
             User user = userRepository.save(newUser);
             log.info(ResponseSuccessUtils.USER_REGISTRATION_SUCCESS);
-            kafkaService.publishUserCreatedEvent(user);
+//            kafkaService.publishUserCreatedEvent(user);
             return user;
         } catch (Exception exp) {
             log.error(UserUtils.ERROR_PERSISTING_USER, newUser);
@@ -182,7 +181,7 @@ public class AuthenticationService {
         return user;
     }
 
-    public void logoutAuthUser(HttpServletRequest request, HttpServletResponse response) {
+    public boolean logoutAuthUser(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookiesArray = request.getCookies();
         if (cookiesArray != null) {
             for (Cookie cookie : cookiesArray) {
@@ -203,5 +202,6 @@ public class AuthenticationService {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
         SecurityContextHolder.clearContext();
+        return true;
     }
 }

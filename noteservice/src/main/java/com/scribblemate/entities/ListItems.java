@@ -1,13 +1,7 @@
 package com.scribblemate.entities;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import com.scribblemate.common.entities.CommonFields;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
