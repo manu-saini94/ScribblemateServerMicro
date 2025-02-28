@@ -24,7 +24,7 @@ public class UserContextAspect {
     @Autowired
     private UserRepository userRepository;
 
-    @Pointcut("@annotation(com.scribblemate.annotation.LoadUserContext)")
+    @Pointcut("@annotation(com.scribblemate.annotation.LoadUserContext) || @within(com.scribblemate.annotation.LoadUserContext)")
     public void restControllerMethods() {
     }
 
@@ -34,16 +34,10 @@ public class UserContextAspect {
         if (authentication != null && authentication.isAuthenticated()) {
             User principal = (User) authentication.getPrincipal();
             String userEmail = principal.getEmail();
-            User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("User not found with this email : " + userEmail));
-            UserContext.setCurrentUser(user);
+            userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("User not found with this email : " + userEmail));
         }else{
             log.error(ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS.getMessage());
             throw new AccessDeniedException(ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS.getMessage());
         }
-    }
-
-    @After("restControllerMethods()")
-    public void clearUserContext(JoinPoint joinPoint) {
-        UserContext.clear();
     }
 }

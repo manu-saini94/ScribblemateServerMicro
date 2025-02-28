@@ -1,13 +1,12 @@
 package com.scribblemate.controller;
 
 import java.util.List;
-
 import com.scribblemate.annotation.LoadUserContext;
-import com.scribblemate.aspect.UserContext;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.scribblemate.dto.CollaboratorDto;
 import com.scribblemate.common.dto.UserDto;
@@ -39,32 +38,29 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<SuccessResponse<Boolean>> deleteUser() {
-        User user = UserContext.getCurrentUser();
+    public ResponseEntity<SuccessResponse<Boolean>> deleteUser(@AuthenticationPrincipal User user) {
         boolean isDeleted = userService.deleteUser(user);
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_DELETE_SUCCESS, isDeleted));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<SuccessResponse<UserDto>> updateUser(@RequestBody UserDto userDto) {
-        User user = UserContext.getCurrentUser();
+    public ResponseEntity<SuccessResponse<UserDto>> updateUser(@RequestBody UserDto userDto,
+                                                               @AuthenticationPrincipal User user) {
         UserDto userDetailsDto = userService.updateUserDetails(userDto, user);
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
     }
 
     @PutMapping("/activate")
-    public ResponseEntity<SuccessResponse<UserDto>> activateUser() {
-        User user = UserContext.getCurrentUser();
+    public ResponseEntity<SuccessResponse<UserDto>> activateUser(@AuthenticationPrincipal User user) {
         UserDto userDetailsDto = userService.activateUser(user);
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
     }
 
     @PutMapping("/deactivate")
-    public ResponseEntity<SuccessResponse<UserDto>> deactivateUser() {
-        User user = UserContext.getCurrentUser();
+    public ResponseEntity<SuccessResponse<UserDto>> deactivateUser(@AuthenticationPrincipal User user) {
         UserDto userDetailsDto = userService.deactivateUser(user);
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.USER_UPDATE_SUCCESS, userDetailsDto));
