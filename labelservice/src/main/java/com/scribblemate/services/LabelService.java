@@ -150,11 +150,15 @@ public class LabelService {
     }
 
     @Transactional
-    public Boolean addLabelInNote(Long labelId, Long noteId) {
+    public Boolean addLabelInNote(Long labelId, Long noteId, Long userId) {
         try {
-            labelRepository.addLabelToNote(labelId, noteId);
-            log.info(LabelUtils.LABEL_PERSIST_SUCCESS);
-            return true;
+            Label label = labelRepository.findById(labelId).orElseThrow(() -> new LabelNotFoundException());
+            if (label.getUserId() == userId) {
+                labelRepository.addLabelToNote(labelId, noteId);
+                log.info(LabelUtils.LABEL_PERSIST_SUCCESS);
+                return true;
+            }
+            return false;
         } catch (Exception ex) {
             log.error(LabelUtils.LABEL_PERSIST_ERROR, new LabelNotPersistedException(ex.getMessage()));
             throw new LabelNotPersistedException(ex.getMessage());
@@ -162,11 +166,15 @@ public class LabelService {
     }
 
     @Transactional
-    public Boolean deleteLabelInNote(Long labelId, Long noteId) {
+    public Boolean deleteLabelInNote(Long labelId, Long noteId, Long userId) {
         try {
-            labelRepository.deleteLabelFromNote(labelId, noteId);
-            log.info(LabelUtils.LABEL_DELETE_SUCCESS);
-            return true;
+            Label label = labelRepository.findById(labelId).orElseThrow(() -> new LabelNotFoundException());
+            if (label.getUserId() == userId) {
+                labelRepository.deleteLabelFromNote(labelId, noteId);
+                log.info(LabelUtils.LABEL_DELETE_SUCCESS);
+                return true;
+            }
+            return false;
         } catch (Exception ex) {
             log.error(LabelUtils.LABEL_DELETE_ERROR, new LabelNotDeletedException(ex.getMessage()));
             throw new LabelNotDeletedException(ex.getMessage());

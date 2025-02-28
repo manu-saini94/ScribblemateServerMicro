@@ -1,14 +1,13 @@
 package com.scribblemate.controller;
 
 import com.scribblemate.annotation.LoadUserContext;
-import com.scribblemate.aspect.UserContext;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,8 +72,7 @@ public class AuthenticationController {
 
     @LoadUserContext
     @GetMapping("/validate")
-    public ResponseEntity<SuccessResponse<UserDto>> validateUser() {
-        User user = UserContext.getCurrentUser();
+    public ResponseEntity<SuccessResponse<UserDto>> validateUser(@AuthenticationPrincipal User user) {
         UserDto userResponseDto = userService.getUserDtoFromUser(user);
         return ResponseEntity.ok().body(new SuccessResponse<>(HttpStatus.OK.value(),
                 ResponseSuccessUtils.USER_VALIDATION_SUCCESS, userResponseDto));

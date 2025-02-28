@@ -47,7 +47,7 @@ public class User implements Authentication {
 
     @Override
     public boolean isAuthenticated() {
-        return false;
+        return this.authenticated;
     }
 
     @Override
