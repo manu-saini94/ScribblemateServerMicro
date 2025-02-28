@@ -1,6 +1,8 @@
 package com.scribblemate.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.scribblemate.annotation.LoadUserContext;
 import com.scribblemate.common.dto.NoteLabelDto;
@@ -29,7 +31,8 @@ public class LabelController {
         User user = UserContext.getCurrentUser();
         LabelDto newLabelDto = labelService.createNewLabel(labelDto, user.getId());
         return ResponseEntity.ok().body(
-                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, newLabelDto));
+                new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, newLabelDto));
     }
 
     @PutMapping("/update")
@@ -37,7 +40,8 @@ public class LabelController {
         User user = UserContext.getCurrentUser();
         LabelDto updatedLabelDto = labelService.editLabel(labelDto, user.getId());
         return ResponseEntity.ok().body(
-                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, updatedLabelDto));
+                new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, updatedLabelDto));
     }
 
     @GetMapping("/all")
@@ -45,7 +49,8 @@ public class LabelController {
         User user = UserContext.getCurrentUser();
         List<LabelDto> labelList = labelService.getLabelsByUser(user.getId());
         return ResponseEntity.ok().body(
-                new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelList));
+                new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelList));
     }
 
     @DeleteMapping("/delete")
@@ -53,15 +58,52 @@ public class LabelController {
         User user = UserContext.getCurrentUser();
         boolean isDeleted = labelService.deleteLabel(labelId, user.getId());
         return ResponseEntity.ok()
-                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_DELETE_SUCCESS, isDeleted));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_DELETE_SUCCESS, isDeleted));
     }
 
-    @PostMapping("add/note")
-    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody List<Long> labelIds, @RequestParam("noteId") Long noteId){
+    @GetMapping("/note/all")
+    public ResponseEntity<SuccessResponse<Map<Long, Set<Long>>>> getLabelsWithNoteIds() {
         User user = UserContext.getCurrentUser();
-        NoteLabelDto noteLabelDto = labelService.addLabelListInNote(labelIds,noteId,user.getId());
+        Map<Long, Set<Long>>  labelsByNotesMap = labelService.getLabelsByNoteIds(user.getId());
         return ResponseEntity.ok()
-                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, noteLabelDto));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelsByNotesMap));
 
     }
+
+    @PutMapping("/note/{noteId}/assign")
+    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody List<Long> labelIds,
+                                                                            @PathVariable("noteId") Long noteId) {
+        User user = UserContext.getCurrentUser();
+        NoteLabelDto noteLabelDto = labelService.addLabelListInNote(labelIds, noteId, user.getId());
+        return ResponseEntity.ok()
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, noteLabelDto));
+
+    }
+
+    @PutMapping("/note/{noteId}/assign/{labelId}")
+    public ResponseEntity<SuccessResponse<Boolean>> addLabelToNote(@PathVariable("labelId") Long labelId,
+                                                                   @PathVariable("noteId") Long noteId) {
+        User user = UserContext.getCurrentUser();
+        Boolean isAdded = labelService.addLabelInNote(labelId, noteId, user.getId());
+        return ResponseEntity.ok()
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, isAdded));
+
+    }
+
+    @DeleteMapping("/note/{noteId}/unassign/{labelId}")
+    public ResponseEntity<SuccessResponse<Boolean>> deleteLabelInsideNote(@PathVariable("labelId") Long labelId,
+                                                                          @PathVariable("noteId") Long noteId) {
+        User user = UserContext.getCurrentUser();
+        Boolean isAdded = labelService.deleteLabelInNote(labelId, noteId, user.getId());
+        return ResponseEntity.ok()
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, isAdded));
+
+    }
+
+
 }
