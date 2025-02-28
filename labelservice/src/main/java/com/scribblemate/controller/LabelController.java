@@ -3,6 +3,7 @@ package com.scribblemate.controller;
 import java.util.List;
 
 import com.scribblemate.annotation.LoadUserContext;
+import com.scribblemate.common.dto.NoteLabelDto;
 import com.scribblemate.configuration.UserContext;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.entities.User;
@@ -55,4 +56,12 @@ public class LabelController {
                 .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_DELETE_SUCCESS, isDeleted));
     }
 
+    @PostMapping("add/note")
+    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody List<Long> labelIds, @RequestParam("noteId") Long noteId){
+        User user = UserContext.getCurrentUser();
+        NoteLabelDto noteLabelDto = labelService.addLabelListInNote(labelIds,noteId,user.getId());
+        return ResponseEntity.ok()
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, noteLabelDto));
+
+    }
 }

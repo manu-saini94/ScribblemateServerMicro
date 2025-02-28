@@ -1,6 +1,7 @@
 package com.scribblemate.repositories;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -32,5 +33,24 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
     @Query(value = "SELECT * from label WHERE user_id = :userId", nativeQuery = true)
     List<Label> findAllByUserIdOrderByLabelName(@Param("userId") Long userId);
 
-//	Label findByUserAndLabelName(User user, String labelName);
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO label_note_ids (label_id, note_id) " +
+            "SELECT lb.id, :noteId FROM label lb WHERE lb.id IN :labelIds", nativeQuery = true)
+    int addLabelIdsToNote(@Param("labelIds") List<Long> labelIds, @Param("noteId") Long noteId);
+
+    @Query("SELECT lb.id FROM Label lb WHERE :noteId MEMBER OF lb.noteIds")
+    Set<Long> findLabelIdsByNoteId(@Param("noteId") Long noteId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO label_note_ids (label_id, note_id) VALUES (:labelId, :noteId)", nativeQuery = true)
+    int addLabelToNote(@Param("labelId") Long labelId, @Param("noteId") Long noteId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM label_note_ids lbn WHERE lbn.label_id = :labelId AND lbn.note_id = :noteId ", nativeQuery = true)
+    int deleteLabelFromNote(@Param("labelId") Long labelId, @Param("noteId") Long noteId);
+
+
 }
