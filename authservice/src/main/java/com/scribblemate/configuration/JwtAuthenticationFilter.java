@@ -28,6 +28,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 @Order(2)
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -76,23 +77,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 for (Cookie cookie : cookiesArray) {
                     if (Utils.TokenType.ACCESS_TOKEN.getValue().equals(cookie.getName())) {
                         accessTokenString = cookie.getValue();
-                        if (accessTokenString == null) {
-                            throw new TokenMissingOrInvalidException("Access token not found in request cookies");
-                        } else if (!jwtService.isAccessToken(accessTokenString)) {
-                            throw new TokenMissingOrInvalidException("Access token is Invalid!");
-                        } else if (jwtService.isTokenExpired(accessTokenString)) {
-                            throw new TokenExpiredException("Access token has expired!");
-                        }
                     } else if (Utils.TokenType.REFRESH_TOKEN.getValue().equals(cookie.getName())) {
                         refreshTokenString = cookie.getValue();
-                        if (refreshTokenString == null) {
-                            throw new TokenMissingOrInvalidException("Refresh token not found in request cookies");
-                        } else if (!jwtService.isRefreshToken(refreshTokenString)) {
-                            throw new TokenMissingOrInvalidException("Refresh token is Invalid!");
-                        } else if (jwtService.isTokenExpired(refreshTokenString)) {
-                            throw new TokenExpiredException("Refresh token has expired!");
-                        }
                     }
+                }
+                if (accessTokenString == null) {
+                    throw new TokenMissingOrInvalidException("Access token not found in request cookies");
+                } else if (!jwtService.isAccessToken(accessTokenString)) {
+                    throw new TokenMissingOrInvalidException("Access token is Invalid!");
+                } else if (jwtService.isTokenExpired(accessTokenString)) {
+                    throw new TokenExpiredException("Access token has expired!");
+                }
+                if (refreshTokenString == null) {
+                    throw new TokenMissingOrInvalidException("Refresh token not found in request cookies");
+                } else if (!jwtService.isRefreshToken(refreshTokenString)) {
+                    throw new TokenMissingOrInvalidException("Refresh token is Invalid!");
+                } else if (jwtService.isTokenExpired(refreshTokenString)) {
+                    throw new TokenExpiredException("Refresh token has expired!");
                 }
             } else {
                 throw new TokenMissingOrInvalidException("Cookies are missing from the request");

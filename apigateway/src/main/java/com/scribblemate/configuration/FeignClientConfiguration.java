@@ -1,7 +1,9 @@
 package com.scribblemate.configuration;
 
+import com.scribblemate.common.exceptions.FeignErrorDecoder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import feign.codec.ErrorDecoder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,5 +31,10 @@ public class FeignClientConfiguration {
                 }
             }
         };
+    }
+
+    @Bean
+    public ErrorDecoder errorDecoder() {
+        return new FeignErrorDecoder();
     }
 }

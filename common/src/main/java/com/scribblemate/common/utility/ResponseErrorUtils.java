@@ -29,6 +29,15 @@ public enum ResponseErrorUtils {
         this.message = message;
     }
 
+    public static ResponseErrorUtils fromMessage(String message) {
+        for (ResponseErrorUtils error : ResponseErrorUtils.values()) {
+            if (error.name().equals(message)) {
+                return error;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant with message " + message);
+    }
+
     public String getMessage() {
         return message;
     }
