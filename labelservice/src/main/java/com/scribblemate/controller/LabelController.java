@@ -66,7 +66,6 @@ public class LabelController {
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelsByNotesMap));
-
     }
 
     @PutMapping("/note/{noteId}/assign")
@@ -76,7 +75,7 @@ public class LabelController {
         NoteLabelDto noteLabelDto = labelService.addLabelListInNote(labelIds, noteId, user.getId());
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
-                        ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, noteLabelDto));
+                        ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, noteLabelDto));
 
     }
 
@@ -87,7 +86,7 @@ public class LabelController {
         Boolean isAdded = labelService.addLabelInNote(labelId, noteId, user.getId());
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
-                        ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, isAdded));
+                        ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, isAdded));
 
     }
 
@@ -98,9 +97,6 @@ public class LabelController {
         Boolean isAdded = labelService.deleteLabelInNote(labelId, noteId, user.getId());
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
-                        ResponseSuccessUtils.LABEL_PERSIST_SUCCESS, isAdded));
-
+                        ResponseSuccessUtils.LABEL_DELETE_SUCCESS, isAdded));
     }
-
-
 }

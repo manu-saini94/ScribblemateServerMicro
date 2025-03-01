@@ -48,7 +48,7 @@ public class LabelService {
     @Transactional
     public boolean deleteLabel(Long labelId, Long userId) {
         try {
-            labelRepository.deleteByIdAndUser(labelId, userId);
+            labelRepository.deleteByIdAndUserId(labelId, userId);
             log.info(LabelUtils.LABEL_DELETE_SUCCESS, labelId);
             return true;
         } catch (Exception ex) {
@@ -61,7 +61,7 @@ public class LabelService {
     public LabelDto editLabel(LabelDto labelDto, Long userId) {
 
         try {
-            Label label = labelRepository.findByUserIdAndLabelName(userId, labelDto.getLabelName());
+            Label label = labelRepository.findByIdAndUserId(labelDto.getId(),userId);
             label.setLabelName(labelDto.getLabelName());
             label.setImportant(labelDto.isImportant());
             Label savedLabel = labelRepository.save(label);
