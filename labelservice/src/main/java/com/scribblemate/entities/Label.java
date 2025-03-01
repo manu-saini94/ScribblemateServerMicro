@@ -29,7 +29,7 @@ public class Label extends CommonFields {
     @JsonProperty(value = "isImportant")
     private boolean isImportant;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "label_note_ids", joinColumns = @JoinColumn(name = "label_id"))
     @Column(name = "note_id")
     private Set<Long> noteIds = new HashSet<>();
