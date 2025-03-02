@@ -3,9 +3,7 @@ package com.scribblemate.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.scribblemate.common.dto.NoteLabelDto;
-import com.scribblemate.configuration.UserContext;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,16 @@ public class LabelController {
 
     @Autowired
     private LabelService labelService;
+
+    // Create Api for getting all notes with labels
+
+//    @GetMapping("/labelled")
+//    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllNotesWithLabels(@AuthenticationPrincipal User user) {
+//        List<NoteDto> notesList = noteService.getAllNotesWithLabelsByUser(user);
+//        return ResponseEntity.ok().body(
+//                new SuccessResponse<>(HttpStatus.OK.value(),
+//                        ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+//    }
 
     @PostMapping("/create")
     public ResponseEntity<SuccessResponse<LabelDto>> createLabel(@RequestBody LabelDto labelDto,

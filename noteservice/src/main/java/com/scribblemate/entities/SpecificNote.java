@@ -57,13 +57,7 @@ public class SpecificNote extends CommonFields {
 	@Column(name = "role")
 	private Utils.Role role;
 
-	@ManyToOne
-	private User user;
-
-	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
-	@JoinTable(name = "note_label", joinColumns = { @JoinColumn(name = "note_id") }, inverseJoinColumns = {
-			@JoinColumn(name = "label_id") })
-	private Set<Label> labelSet;
+	private Long userId;
 
 	@ManyToOne
 	private Note commonNote;
