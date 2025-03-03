@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
 import com.scribblemate.entities.User;
-import com.scribblemate.repositories.UserRepository;
 import com.scribblemate.common.utility.Utils;
 import com.scribblemate.services.JwtAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     private final JwtAuthenticationService jwtService;
-
-    @Autowired
-    private UserRepository userRepository;
 
     public JwtAuthenticationFilter(HandlerExceptionResolver handlerExceptionResolver,
                                    JwtAuthenticationService jwtService, UserDetailsService userDetailsService) {
@@ -62,10 +58,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             Long userId = jwtService.extractUserId(accessTokenString);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (userId != null && authentication == null){
+            if (userId != null && authentication == null) {
                 User user = new User();
                 user.setId(userId);
-//                SecurityContextHolder.getContext().setAuthentication(user);
+                user.setAuthenticated(true);
+                SecurityContextHolder.getContext().setAuthentication(user);
             }
             filterChain.doFilter(request, response);
         } catch (Exception exception) {

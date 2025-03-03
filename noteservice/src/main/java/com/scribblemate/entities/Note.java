@@ -1,19 +1,12 @@
 package com.scribblemate.entities;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Index;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,21 +31,21 @@ public class Note extends CommonFields {
 	private String content;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> images;
+	private List<String> images = new ArrayList<>();
 
-	@ManyToMany(mappedBy = "noteList", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<User> collaboratorList;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "note_user_ids", joinColumns = @JoinColumn(name = "note_id"))
+	@Column(name = "user_id")
+	private Set<Long> userIds = new HashSet<>();
 
 	@OneToMany(mappedBy = "commonNote", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private List<SpecificNote> specificNoteList;
+	private List<SpecificNote> specificNoteList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "commonNote", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private List<ListItems> listItems;
+	private List<ListItems> listItems = new ArrayList<>();
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	private User updatedBy;
+	private Long updatedBy;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	private User createdBy;
+	private Long createdBy;
 
 }

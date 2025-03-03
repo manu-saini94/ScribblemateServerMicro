@@ -3,9 +3,7 @@ package com.scribblemate.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.scribblemate.common.dto.NoteLabelDto;
-import com.scribblemate.configuration.UserContext;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,16 @@ public class LabelController {
 
     @Autowired
     private LabelService labelService;
+
+    // Create Api for getting all notes with labels
+
+//    @GetMapping("/labelled")
+//    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllNotesWithLabels(@AuthenticationPrincipal User user) {
+//        List<NoteDto> notesList = noteService.getAllNotesWithLabelsByUser(user);
+//        return ResponseEntity.ok().body(
+//                new SuccessResponse<>(HttpStatus.OK.value(),
+//                        ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+//    }
 
     @PostMapping("/create")
     public ResponseEntity<SuccessResponse<LabelDto>> createLabel(@RequestBody LabelDto labelDto,
@@ -44,8 +52,8 @@ public class LabelController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<SuccessResponse<List<LabelDto>>> getAllLabelsByUser(@AuthenticationPrincipal User user) {
-        List<LabelDto> labelList = labelService.getLabelsByUser(user.getId());
+    public ResponseEntity<SuccessResponse<Set<LabelDto>>> getAllLabelsByUser(@AuthenticationPrincipal User user) {
+        Set<LabelDto> labelList = labelService.getLabelsByUser(user.getId());
         return ResponseEntity.ok().body(
                 new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelList));
@@ -69,7 +77,7 @@ public class LabelController {
     }
 
     @PutMapping("/note/{noteId}/assign")
-    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody List<Long> labelIds,
+    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody Set<Long> labelIds,
                                                                             @PathVariable("noteId") Long noteId,
                                                                             @AuthenticationPrincipal User user) {
         NoteLabelDto noteLabelDto = labelService.addLabelListInNote(labelIds, noteId, user.getId());

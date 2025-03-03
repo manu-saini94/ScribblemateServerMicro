@@ -4,10 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.scribblemate.entities.User;
-
 public class NoteDto {
 
     private Long id;
@@ -32,18 +28,18 @@ public class NoteDto {
 
     private LocalDateTime updatedAt;
 
-    private CollaboratorDto createdBy;
+    private Long createdBy;
 
-    private CollaboratorDto updatedBy;
+    private Long updatedBy;
 
-    private Set<Long> labelSet;
+    private Set<Long> labelIds;
 
     private List<ListItemsDto> listItems;
 
-    private List<CollaboratorDto> collaboratorList;
+    private Set<Long> collaboratorIds;
 
-    @JsonIgnore
-    private User user;
+//    @JsonIgnore
+//    private User user;
 
     public Long getId() {
         return id;
@@ -133,44 +129,12 @@ public class NoteDto {
         this.updatedAt = updatedAt;
     }
 
-    public List<CollaboratorDto> getCollaboratorList() {
-        return collaboratorList;
+    public Set<Long> getCollaboratorIds() {
+        return collaboratorIds;
     }
 
-    public void setCollaboratorList(List<CollaboratorDto> collaboratorList) {
-        this.collaboratorList = collaboratorList;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Set<Long> getLabelSet() {
-        return labelSet;
-    }
-
-    public void setLabelSet(Set<Long> labelSet) {
-        this.labelSet = labelSet;
-    }
-
-    public CollaboratorDto getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(CollaboratorDto createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public CollaboratorDto getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(CollaboratorDto updatedBy) {
-        this.updatedBy = updatedBy;
+    public void setCollaboratorIds(Set<Long> collaboratorIds) {
+        this.collaboratorIds = collaboratorIds;
     }
 
     public List<ListItemsDto> getListItems() {
@@ -185,10 +149,34 @@ public class NoteDto {
         super();
     }
 
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public Set<Long> getLabelIds() {
+        return labelIds;
+    }
+
+    public void setLabelIds(Set<Long> labelIds) {
+        this.labelIds = labelIds;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
     public NoteDto(Long id, String title, String content, List<String> images, boolean isTrashed, boolean isArchived,
                    boolean isPinned, String color, LocalDateTime reminder, LocalDateTime createdAt,
-                   LocalDateTime updatedAt, CollaboratorDto createdBy, CollaboratorDto updatedBy, Set<Long> labelSet,
-                   List<ListItemsDto> listItems, List<CollaboratorDto> collaboratorList, User user) {
+                   LocalDateTime updatedAt, Long createdBy, Long updatedBy, Set<Long> labelIds,
+                   List<ListItemsDto> listItems, Set<Long> collaboratorIds) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -202,9 +190,8 @@ public class NoteDto {
         this.updatedAt = updatedAt;
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
-        this.labelSet = labelSet;
+        this.labelIds = labelIds;
         this.listItems = listItems;
-        this.collaboratorList = collaboratorList;
-        this.user = user;
+        this.collaboratorIds = collaboratorIds;
     }
 }

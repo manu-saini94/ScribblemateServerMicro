@@ -61,7 +61,7 @@ public class LabelService {
     public LabelDto editLabel(LabelDto labelDto, Long userId) {
 
         try {
-            Label label = labelRepository.findByIdAndUserId(labelDto.getId(),userId);
+            Label label = labelRepository.findByIdAndUserId(labelDto.getId(), userId);
             label.setLabelName(labelDto.getLabelName());
             label.setImportant(labelDto.isImportant());
             Label savedLabel = labelRepository.save(label);
@@ -73,22 +73,22 @@ public class LabelService {
         }
     }
 
-    public List<Label> getAllLabelsByUser(Long userId) {
+    public Set<Label> getAllLabelsByUser(Long userId) {
         try {
-            List<Label> labelList = labelRepository.findAllByUserIdOrderByLabelName(userId);
-            return labelList;
+            Set<Label> labelSet = labelRepository.findAllByUserIdOrderByLabelName(userId);
+            return labelSet;
         } catch (Exception ex) {
             log.error(LabelUtils.LABEL_FETCH_ERROR, userId, new LabelsNotFoundException(ex.getMessage()));
             throw new LabelsNotFoundException(ex.getMessage());
         }
     }
 
-    public List<LabelDto> getLabelsByUser(Long userId) {
+    public Set<LabelDto> getLabelsByUser(Long userId) {
         try {
-            List<Label> labelList = getAllLabelsByUser(userId);
+            Set<Label> labelList = getAllLabelsByUser(userId);
             log.info(LabelUtils.LABEL_FETCH_SUCCESS, userId);
-            List<LabelDto> labelDtoList = labelList.stream().map(label -> getLabelDtoFromLabel(label)).toList();
-            return labelDtoList;
+            Set<LabelDto> labelDtoSet = labelList.stream().map(label -> getLabelDtoFromLabel(label)).collect(Collectors.toSet());
+            return labelDtoSet;
         } catch (Exception ex) {
             log.error(LabelUtils.LABEL_FETCH_ERROR, userId, new LabelsNotFoundException(ex.getMessage()));
             throw new LabelsNotFoundException(ex.getMessage());
@@ -97,7 +97,7 @@ public class LabelService {
 
     public Map<Long, Set<Long>> getLabelsByNoteIds(Long userId) {
         try {
-            List<Label> labelList = getAllLabelsByUser(userId);
+            Set<Label> labelList = getAllLabelsByUser(userId);
             log.info(LabelUtils.LABEL_FETCH_SUCCESS, userId);
             Set<Long> distinctNoteIds = labelList.stream()
                     .flatMap(label -> label.getNoteIds().stream())
@@ -129,7 +129,7 @@ public class LabelService {
     }
 
     @Transactional
-    public NoteLabelDto addLabelListInNote(List<Long> labelIds, Long noteId, Long userId) {
+    public NoteLabelDto addLabelListInNote(Set<Long> labelIds, Long noteId, Long userId) {
         NoteLabelDto noteLabelDto = new NoteLabelDto();
         try {
             Long labelId = labelIds.stream().findFirst().get();

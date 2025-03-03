@@ -1,4 +1,4 @@
-package com.scribblemate.dto;
+package com.scribblemate.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
