@@ -32,7 +32,7 @@ public class NoteDto {
 
     private Long updatedBy;
 
-    private Set<Long> labelSet;
+    private Set<Long> labelIds;
 
     private List<ListItemsDto> listItems;
 
@@ -133,17 +133,8 @@ public class NoteDto {
         return collaboratorIds;
     }
 
-    public void setCollaboratorIds(Set<Long> collaboratorList) {
+    public void setCollaboratorIds(Set<Long> collaboratorIds) {
         this.collaboratorIds = collaboratorIds;
-    }
-
-
-    public Set<Long> getLabelSet() {
-        return labelSet;
-    }
-
-    public void setLabelSet(Set<Long> labelSet) {
-        this.labelSet = labelSet;
     }
 
     public List<ListItemsDto> getListItems() {
@@ -170,11 +161,22 @@ public class NoteDto {
         return updatedBy;
     }
 
+    public Set<Long> getLabelIds() {
+        return labelIds;
+    }
+
+    public void setLabelIds(Set<Long> labelIds) {
+        this.labelIds = labelIds;
+    }
+
     public void setUpdatedBy(Long updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public NoteDto(Long id, String title, String content, List<String> images, boolean isTrashed, boolean isArchived, boolean isPinned, String color, LocalDateTime reminder, LocalDateTime createdAt, LocalDateTime updatedAt, Long createdBy, Long updatedBy, Set<Long> labelSet, List<ListItemsDto> listItems, Set<Long> collaboratorIds) {
+    public NoteDto(Long id, String title, String content, List<String> images, boolean isTrashed, boolean isArchived,
+                   boolean isPinned, String color, LocalDateTime reminder, LocalDateTime createdAt,
+                   LocalDateTime updatedAt, Long createdBy, Long updatedBy, Set<Long> labelIds,
+                   List<ListItemsDto> listItems, Set<Long> collaboratorIds) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -188,7 +190,7 @@ public class NoteDto {
         this.updatedAt = updatedAt;
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
-        this.labelSet = labelSet;
+        this.labelIds = labelIds;
         this.listItems = listItems;
         this.collaboratorIds = collaboratorIds;
     }

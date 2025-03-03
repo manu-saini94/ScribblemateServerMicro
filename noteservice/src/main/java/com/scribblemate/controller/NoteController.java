@@ -8,15 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.scribblemate.dto.ColorUpdateDto;
 import com.scribblemate.dto.NoteDto;
 import com.scribblemate.services.NoteService;
@@ -38,7 +30,7 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_PERSIST_SUCCESS, note));
     }
 
-    @GetMapping("/all")
+    @GetMapping("/fetch/all")
     public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllNotes(@AuthenticationPrincipal User user) {
         List<NoteDto> notesList = noteService.getAllNotesForUser(user.getId());
         return ResponseEntity.ok().body(
@@ -46,7 +38,7 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
-    @GetMapping("/get")
+    @GetMapping("/fetch")
     public ResponseEntity<SuccessResponse<NoteDto>> getNote(@RequestParam("noteId") Long noteId,
                                                             @AuthenticationPrincipal User user) {
         NoteDto note = noteService.getNoteById(user.getId(), noteId);
@@ -55,7 +47,7 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, note));
     }
 
-    @GetMapping("/get/trash")
+    @GetMapping("/fetch/trash")
     public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllTrashedNotes(@AuthenticationPrincipal User user) {
         List<NoteDto> notesList = noteService.getAllNotesByIsTrashed(user.getId());
         return ResponseEntity.ok().body(
@@ -63,7 +55,7 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
-    @GetMapping("/get/archive")
+    @GetMapping("/fetch/archive")
     public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllArchivedNotes(@AuthenticationPrincipal User user) {
         List<NoteDto> notesList = noteService.getAllNotesByIsArchived(user.getId());
         return ResponseEntity.ok().body(
@@ -71,7 +63,7 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
     }
 
-    @GetMapping("/get/reminder")
+    @GetMapping("/fetch/reminder")
     public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllReminderNotes(@AuthenticationPrincipal User user) {
         List<NoteDto> notesList = noteService.getAllNotesByReminder(user.getId());
         return ResponseEntity.ok().body(
@@ -124,9 +116,9 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
     }
 
-    @PostMapping("/add/collaborator")
-    public ResponseEntity<SuccessResponse> addCollaboratorToNote(@RequestParam("collaboratorId") Long collaboratorId,
-                                                                 @RequestParam("noteId") Long noteId,
+    @PutMapping("/assign/{noteId}/collaborator/{collaboratorId}")
+    public ResponseEntity<SuccessResponse> addCollaboratorToNote(@PathVariable("collaboratorId") Long collaboratorId,
+                                                                 @PathVariable("noteId") Long noteId,
                                                                  @AuthenticationPrincipal User user) {
         NoteDto note = noteService.addCollaboratorToNote(user.getId(), noteId, collaboratorId);
         return ResponseEntity.ok()
@@ -134,9 +126,9 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
     }
 
-    @DeleteMapping("/delete/collaborator")
-    public ResponseEntity<SuccessResponse> removeCollaboratorFromNote(@RequestParam("noteId") Long noteId,
-                                                                      @RequestParam("collaboratorId") Long collaboratorId,
+    @DeleteMapping("/unassign/{noteId}/collaborator/{collaboratorId}")
+    public ResponseEntity<SuccessResponse> removeCollaboratorFromNote(@PathVariable("collaboratorId") Long collaboratorId,
+                                                                      @PathVariable("noteId") Long noteId,
                                                                       @AuthenticationPrincipal User user) {
         NoteDto note = noteService.deleteCollaboratorFromNote(user.getId(), noteId, collaboratorId);
         return ResponseEntity.ok().body(

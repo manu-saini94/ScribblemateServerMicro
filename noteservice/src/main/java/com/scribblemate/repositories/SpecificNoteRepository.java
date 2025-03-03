@@ -19,6 +19,8 @@ public interface SpecificNoteRepository extends JpaRepository<SpecificNote, Long
 
     Optional<SpecificNote> findById(Long id);
 
+    Optional<SpecificNote> findByIdAndUserId(Long noteId, Long userId);
+
     List<SpecificNote> findAllByUserIdAndIsTrashedFalseAndIsArchivedFalseOrderByCommonNoteCreatedAtDesc(Long userId);
 
     List<SpecificNote> findAllByUserIdOrderByCommonNoteCreatedAtDesc(Long userId);
@@ -46,6 +48,7 @@ public interface SpecificNoteRepository extends JpaRepository<SpecificNote, Long
 
     @Transactional
     @Modifying
-    int deleteByIdAndUserId(Long noteId,Long userId);
+    int deleteByIdAndUserId(Long noteId, Long userId);
+
 
 }

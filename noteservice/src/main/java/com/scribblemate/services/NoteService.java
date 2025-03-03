@@ -1,31 +1,22 @@
 package com.scribblemate.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.scribblemate.common.exceptions.UserNotFoundException;
-import com.scribblemate.entities.User;
 import com.scribblemate.utility.NoteUtils;
 import com.scribblemate.common.utility.ResponseErrorUtils;
 import com.scribblemate.common.utility.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.scribblemate.dto.CollaboratorDto;
 import com.scribblemate.dto.ColorUpdateDto;
 import com.scribblemate.dto.ListItemsDto;
 import com.scribblemate.dto.NoteDto;
 import com.scribblemate.entities.ListItems;
 import com.scribblemate.entities.Note;
 import com.scribblemate.entities.SpecificNote;
-import com.scribblemate.exceptions.labels.LabelNotDeletedException;
-import com.scribblemate.exceptions.labels.LabelNotFoundException;
 import com.scribblemate.exceptions.notes.CollaboratorAlreadyExistException;
-import com.scribblemate.exceptions.notes.CollaboratorDoesNotExistException;
 import com.scribblemate.exceptions.notes.CollaboratorNotDeletedException;
 import com.scribblemate.exceptions.notes.NoteNotDeletedException;
 import com.scribblemate.exceptions.notes.NoteNotFoundException;
@@ -54,6 +45,9 @@ public class NoteService {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private FeignService feignService;
 
     @Transactional
     public NoteDto createNewNote(NoteDto noteDto, Long userId) {
@@ -135,12 +129,15 @@ public class NoteService {
             try {
                 Note commonNote = note.getCommonNote();
                 SpecificNote collabNote = specificNoteRepository.findByCommonNoteAndUserId(commonNote, collaboratorId);
-                specificNoteRepository.delete(collabNote);
-                commonNote.getUserIds().remove(collaboratorId);
-                noteRepository.save(commonNote);
-                entityManager.flush();
-                entityManager.clear();
-                log.info(NoteUtils.COLLABORATOR_DELETE_SUCCESS, collaboratorId);
+                if (collabNote != null) {
+                    specificNoteRepository.delete(collabNote);
+                    commonNote.getSpecificNoteList().remove(collabNote);
+                    commonNote.getUserIds().remove(collaboratorId);
+                    noteRepository.save(commonNote);
+                    entityManager.flush();
+                    entityManager.clear();
+                    log.info(NoteUtils.COLLABORATOR_DELETE_SUCCESS, collaboratorId);
+                }
                 SpecificNote updatedNote = specificNoteRepository.findById(noteId).get();
                 Note updatedCommonNote = updatedNote.getCommonNote();
                 return setNoteDtoFromNote(updatedCommonNote, userId);
@@ -281,29 +278,34 @@ public class NoteService {
 
     @Transactional
     public boolean deleteNoteByUserAndId(Long userId, Long noteId) {
-
-        SpecificNote note = specificNoteRepository.findById(noteId).get();
-        if (note != null) {
-            try {
-                Note commonNote = note.getCommonNote();
-                List<SpecificNote> noteList = specificNoteRepository.findAllByCommonNote(commonNote);
-                log.info(NoteUtils.NOTE_DELETE_SUCCESS);
-                if (noteList.size() == 1) {
-                    noteRepository.deleteNoteImages(commonNote.getId());
-                    noteRepository.deleteListItems(commonNote.getId());
-                    noteRepository.deleteById(commonNote.getId());
-                    log.info(NoteUtils.NOTE_PERMANENT_DELETE_SUCCESS);
-                }
-                specificNoteRepository.deleteByIdAndUserId(noteId, userId);
-                return true;
-            } catch (Exception ex) {
-                log.error(NoteUtils.ERROR_DELETING_NOTE_FOR_USER, new NoteNotDeletedException(ex.getMessage()));
-                throw new NoteNotDeletedException(ex.getMessage());
-            }
-        } else {
+        SpecificNote specificNote = specificNoteRepository.findByIdAndUserId(noteId,userId).orElseThrow(() -> {
             log.error(NoteUtils.NOTE_NOT_FOUND, noteId, new NoteNotFoundException());
-            throw new NoteNotFoundException();
+            return new NoteNotFoundException();
+        });
+        try {
+            Note commonNote = specificNote.getCommonNote();
+            List<SpecificNote> specificNoteList = commonNote.getSpecificNoteList();
+            if (specificNoteList.size() == 1) {
+                noteRepository.deleteNoteImages(commonNote.getId());
+                noteRepository.deleteListItems(commonNote.getId());
+                specificNoteRepository.deleteByIdAndUserId(noteId, userId);
+                commonNote.getSpecificNoteList().remove(specificNote);
+                commonNote.getUserIds().remove(userId);
+                noteRepository.deleteById(commonNote.getId());
+                log.info(NoteUtils.NOTE_PERMANENT_DELETE_SUCCESS);
+                return true;
+            } else {
+                commonNote.getSpecificNoteList().remove(specificNote);
+                commonNote.getUserIds().remove(userId);
+                specificNoteRepository.deleteByIdAndUserId(noteId, userId);
+                log.info(NoteUtils.NOTE_DELETE_SUCCESS);
+                return true;
+            }
+        } catch (Exception ex) {
+            log.error(NoteUtils.ERROR_DELETING_NOTE_FOR_USER, new NoteNotDeletedException(ex.getMessage()));
+            throw new NoteNotDeletedException(ex.getMessage());
         }
+
     }
 
     @Transactional
@@ -394,7 +396,7 @@ public class NoteService {
         setNoteListItemsFromNoteDtoListItems(noteDto.getListItems(), note);
         note.setImages(noteDto.getImages());
         Note mappedNote = noteRepository.save(note);
-        if (noteDto.getCollaboratorIds() != null) {
+        if (noteDto.getCollaboratorIds() != null && !noteDto.getCollaboratorIds().isEmpty()) {
             Set<Long> collabIdSet = noteDto.getCollaboratorIds().stream()
                     .filter(id -> id != userId).collect(Collectors.toSet());
             Set<Long> nonExistingIds = collabIdSet.stream().filter(
@@ -442,35 +444,6 @@ public class NoteService {
         specificNote.setArchived(noteDto.isArchived());
         specificNote.setUpdatedAt(noteDto.getUpdatedAt());
         specificNote.setCreatedAt(noteDto.getCreatedAt());
-        if (noteDto.getLabelSet() != null) {
-            List<Long> labelIds = noteDto.getLabelSet().stream().collect(Collectors.toList());
-            Iterable<Long> iterableIds = labelIds;
-            // Event publish on labelService side when adding , updating , deleting User Labels which noteService will consume
-            // If not Event then feign client call to the Label Service to add Labels to a Note
-
-
-//            List<Label> labelList = labelRepository.findAllById(iterableIds).stream()
-//                    .filter(label -> label.getUser().getEmail().equals(user.getEmail())).toList();
-//            if (!labelList.isEmpty()) {
-//                labelList.stream().forEach(label -> {
-//                    if (label.getNoteList() != null) {
-//                        label.getNoteList().add(specificNote);
-//                    } else {
-//                        List<SpecificNote> noteList = new ArrayList<>();
-//                        noteList.add(specificNote);
-//                        label.setNoteList(noteList);
-//                    }
-//                });
-//                if (specificNote.getLabelSet() == null) {
-//                    Set<Label> labelSet = new HashSet<>();
-//                    labelSet.addAll(labelList);
-//                    specificNote.setLabelSet(labelSet);
-//                } else {
-//                    specificNote.getLabelSet().addAll(labelList);
-//                }
-//            }
-
-        }
         if (specificNote.getRole() == null) {
             specificNote.setRole(Utils.Role.OWNER);
         }
@@ -480,6 +453,12 @@ public class NoteService {
         specificNote.setUserId(userId);
         specificNote.setCommonNote(updatedNote);
         SpecificNote savedSpecificNote = specificNoteRepository.save(specificNote);
+        if (noteDto.getLabelIds() != null && !noteDto.getLabelIds().isEmpty()) {
+            List<Long> labelIds = noteDto.getLabelIds().stream().collect(Collectors.toList());
+            // Event publish on labelService side when adding , updating , deleting User Labels which noteService will consume
+            // If not Event then feign client call to the Label Service to add Labels to a Note
+            feignService.addLabelsToNote(labelIds, specificNote.getId());
+        }
         List<SpecificNote> specificNoteList = updatedNote.getSpecificNoteList();
         if (specificNoteList == null) {
             specificNoteList = new ArrayList<>();

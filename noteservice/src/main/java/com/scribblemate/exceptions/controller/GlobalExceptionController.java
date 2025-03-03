@@ -1,5 +1,6 @@
 package com.scribblemate.exceptions.controller;
 
+import com.scribblemate.common.exceptions.FeignClientException;
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
@@ -30,6 +31,11 @@ public class GlobalExceptionController {
                                                              String message) {
         ErrorResponse errorResponse = new ErrorResponse(status.value(), error.name(), message);
         return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler(value = FeignClientException.class)
+    public ResponseEntity<ErrorResponse> handleFeignClientException(FeignClientException exp) {
+        return buildErrorResponse(exp.getMessagecode(), exp.getErrorName(), exp.getMessage());
     }
 
     @ExceptionHandler(value = BadCredentialsException.class)

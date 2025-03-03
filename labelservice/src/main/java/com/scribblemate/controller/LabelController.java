@@ -52,8 +52,8 @@ public class LabelController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<SuccessResponse<List<LabelDto>>> getAllLabelsByUser(@AuthenticationPrincipal User user) {
-        List<LabelDto> labelList = labelService.getLabelsByUser(user.getId());
+    public ResponseEntity<SuccessResponse<Set<LabelDto>>> getAllLabelsByUser(@AuthenticationPrincipal User user) {
+        Set<LabelDto> labelList = labelService.getLabelsByUser(user.getId());
         return ResponseEntity.ok().body(
                 new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelList));
@@ -77,7 +77,7 @@ public class LabelController {
     }
 
     @PutMapping("/note/{noteId}/assign")
-    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody List<Long> labelIds,
+    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody Set<Long> labelIds,
                                                                             @PathVariable("noteId") Long noteId,
                                                                             @AuthenticationPrincipal User user) {
         NoteLabelDto noteLabelDto = labelService.addLabelListInNote(labelIds, noteId, user.getId());

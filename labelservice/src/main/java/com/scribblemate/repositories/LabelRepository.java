@@ -27,16 +27,16 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
 //	void deleteAllByUser(User user);
 
     @Query(value = "SELECT id from label WHERE user_id = :userId", nativeQuery = true)
-    List<Long> getLabelIdsByUser(@Param("userId") Long userId);
+    Set<Long> getLabelIdsByUser(@Param("userId") Long userId);
 
     @Query(value = "SELECT * from label WHERE user_id = :userId", nativeQuery = true)
-    List<Label> findAllByUserIdOrderByLabelName(@Param("userId") Long userId);
+    Set<Label> findAllByUserIdOrderByLabelName(@Param("userId") Long userId);
 
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO label_note_ids (label_id, note_id) " +
             "SELECT lb.id, :noteId FROM label lb WHERE lb.id IN :labelIds", nativeQuery = true)
-    int addLabelIdsToNote(@Param("labelIds") List<Long> labelIds, @Param("noteId") Long noteId);
+    int addLabelIdsToNote(@Param("labelIds") Set<Long> labelIds, @Param("noteId") Long noteId);
 
     @Query("SELECT lb.id FROM Label lb WHERE :noteId MEMBER OF lb.noteIds")
     Set<Long> findLabelIdsByNoteId(@Param("noteId") Long noteId);

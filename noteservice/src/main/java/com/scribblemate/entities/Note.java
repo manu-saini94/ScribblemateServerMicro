@@ -1,5 +1,6 @@
 package com.scribblemate.entities;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,7 @@ public class Note extends CommonFields {
 	private String content;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> images;
+	private List<String> images = new ArrayList<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "note_user_ids", joinColumns = @JoinColumn(name = "note_id"))
@@ -38,10 +39,10 @@ public class Note extends CommonFields {
 	private Set<Long> userIds = new HashSet<>();
 
 	@OneToMany(mappedBy = "commonNote", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private List<SpecificNote> specificNoteList;
+	private List<SpecificNote> specificNoteList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "commonNote", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private List<ListItems> listItems;
+	private List<ListItems> listItems = new ArrayList<>();
 
 	private Long updatedBy;
 

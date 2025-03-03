@@ -13,7 +13,7 @@ import com.scribblemate.exceptions.UsersFetchException;
 import com.scribblemate.common.utility.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.scribblemate.dto.CollaboratorDto;
+import com.scribblemate.common.dto.CollaboratorDto;
 import com.scribblemate.common.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.UserRepository;

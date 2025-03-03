@@ -61,7 +61,7 @@ public class GatewayAuthFilter extends OncePerRequestFilter {
                 return;
             }
             ResponseEntity<SuccessResponse<UserDto>> authResponse = apiGatewayService.authenticateUser();
-            log.info("DTO USER INFO :", authResponse);
+            log.info("Authentication Response ", authResponse);
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
             log.error("Exception while calling auth service from filter", exception);
