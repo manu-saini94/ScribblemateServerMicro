@@ -85,11 +85,6 @@ public class NoteService {
         SpecificNote note = specificNoteRepository.findById(noteId).get();
         if (note != null) {
             // Can possibly make a call to User microservice for User validation
-
-//            User collaborator = userRepository.findByEmail(collaboratorEmail)
-//                    .orElseThrow(() -> new CollaboratorDoesNotExistException(
-//                            ResponseErrorUtils.COLLABORATOR_DOES_NOT_EXIST_ERROR.getMessage()));
-
             Note commonNote = note.getCommonNote();
             if (commonNote.getUserIds().stream().anyMatch(id -> id == collaboratorId)) {
                 log.error(NoteUtils.COLLABORATOR_ALREADY_EXIST_ERROR);
@@ -278,7 +273,7 @@ public class NoteService {
 
     @Transactional
     public boolean deleteNoteByUserAndId(Long userId, Long noteId) {
-        SpecificNote specificNote = specificNoteRepository.findByIdAndUserId(noteId,userId).orElseThrow(() -> {
+        SpecificNote specificNote = specificNoteRepository.findByIdAndUserId(noteId, userId).orElseThrow(() -> {
             log.error(NoteUtils.NOTE_NOT_FOUND, noteId, new NoteNotFoundException());
             return new NoteNotFoundException();
         });
@@ -293,14 +288,16 @@ public class NoteService {
                 commonNote.getUserIds().remove(userId);
                 noteRepository.deleteById(commonNote.getId());
                 log.info(NoteUtils.NOTE_PERMANENT_DELETE_SUCCESS);
-                return true;
             } else {
                 commonNote.getSpecificNoteList().remove(specificNote);
                 commonNote.getUserIds().remove(userId);
                 specificNoteRepository.deleteByIdAndUserId(noteId, userId);
                 log.info(NoteUtils.NOTE_DELETE_SUCCESS);
-                return true;
             }
+            // Feign call to label service for deleting all Labels for note
+            feignService.deleteAllLabelsForNote(noteId);
+            log.info(NoteUtils.LABEL_DELETE_SUCCESS);
+            return true;
         } catch (Exception ex) {
             log.error(NoteUtils.ERROR_DELETING_NOTE_FOR_USER, new NoteNotDeletedException(ex.getMessage()));
             throw new NoteNotDeletedException(ex.getMessage());

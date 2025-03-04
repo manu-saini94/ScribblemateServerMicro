@@ -16,11 +16,18 @@ public class FeignService {
     @Autowired
     private LabelClient labelClient;
 
-    public NoteLabelDto addLabelsToNote(List<Long> labelIds,Long noteId){
-        ResponseEntity<SuccessResponse<NoteLabelDto>> response = labelClient.addLabelListToNote(labelIds,noteId);
+    public NoteLabelDto addLabelsToNote(List<Long> labelIds, Long noteId) {
+        ResponseEntity<SuccessResponse<NoteLabelDto>> response = labelClient.addLabelListToNote(labelIds, noteId);
         SuccessResponse<NoteLabelDto> successResponse = response.getBody();
         NoteLabelDto noteLabelDto = successResponse.getData();
         return noteLabelDto;
+    }
+
+    public Boolean deleteAllLabelsForNote(Long noteId) {
+        ResponseEntity<SuccessResponse<Boolean>> response = labelClient.deleteAllLabelsInsideNote(noteId);
+        SuccessResponse<Boolean> successResponse = response.getBody();
+        Boolean isDeleted = successResponse.getData();
+        return isDeleted;
     }
 
 }
