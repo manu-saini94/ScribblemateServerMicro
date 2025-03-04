@@ -1,5 +1,6 @@
 package com.scribblemate.exceptions.controller;
 
+import com.scribblemate.common.exceptions.NotAuthorizedException;
 import com.scribblemate.exceptions.labels.*;
 import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,12 @@ public class GlobalExceptionController {
     @ExceptionHandler(value = LabelAlreadyExistException.class)
     public ResponseEntity<ErrorResponse> handleLabelAlreadyExistException(LabelAlreadyExistException exp) {
         return buildErrorResponse(HttpStatus.CONFLICT, ResponseErrorUtils.LABEL_ALREADY_EXIST_ERROR, exp.getMessage());
+    }
+
+    @ExceptionHandler(value = NotAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleNotAuthorizedException(NotAuthorizedException exp) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS,
+                exp.getMessage());
     }
 
     @ExceptionHandler(value = Exception.class)

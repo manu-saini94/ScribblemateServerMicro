@@ -1,9 +1,6 @@
 package com.scribblemate.exceptions.controller;
 
-import com.scribblemate.common.exceptions.FeignClientException;
-import com.scribblemate.common.exceptions.TokenExpiredException;
-import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
-import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.common.exceptions.*;
 import com.scribblemate.common.responses.ErrorResponse;
 import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
@@ -117,6 +114,13 @@ public class GlobalExceptionController {
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException exp) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ResponseErrorUtils.USER_NOT_FOUND, exp.getMessage());
     }
+
+    @ExceptionHandler(value = NotAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleNotAuthorizedException(NotAuthorizedException exp) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS,
+                exp.getMessage());
+    }
+
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception exp) {

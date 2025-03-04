@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.scribblemate.common.dto.NoteLabelDto;
+import com.scribblemate.common.exceptions.NotAuthorizedException;
+import com.scribblemate.common.utility.ResponseErrorUtils;
+import com.scribblemate.entities.User;
 import com.scribblemate.exceptions.labels.*;
 import com.scribblemate.utility.LabelUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +64,10 @@ public class LabelService {
     public LabelDto editLabel(LabelDto labelDto, Long userId) {
 
         try {
-            Label label = labelRepository.findByIdAndUserId(labelDto.getId(), userId);
+            Label label = labelRepository.findByIdAndUserId(labelDto.getId(), userId).orElseThrow(() -> {
+                log.error(LabelUtils.LABEL_NOT_FOUND);
+                return new LabelNotFoundException();
+            });
             label.setLabelName(labelDto.getLabelName());
             label.setImportant(labelDto.isImportant());
             Label savedLabel = labelRepository.save(label);
@@ -133,7 +139,10 @@ public class LabelService {
         NoteLabelDto noteLabelDto = new NoteLabelDto();
         try {
             Long labelId = labelIds.stream().findFirst().get();
-            Label label = labelRepository.findById(labelId).orElseThrow(() -> new LabelNotFoundException());
+            Label label = labelRepository.findByIdAndUserId(labelId, userId).orElseThrow(() -> {
+                log.error(ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS.getMessage());
+                return new NotAuthorizedException();
+            });
             if (label.getUserId() == userId) {
                 labelRepository.addLabelIdsToNote(labelIds, noteId);
                 log.info(LabelUtils.LABEL_PERSIST_SUCCESS);
@@ -182,4 +191,26 @@ public class LabelService {
     }
 
 
+    public Set<Long> getAllNoteIdsWithLabelsByUser(Long userId) {
+        try {
+            Set<Label> labelSet = getAllLabelsByUser(userId);
+            Set<Long> distinctNoteIds = labelSet.stream().flatMap(label -> label.getNoteIds().stream()).collect(Collectors.toSet());
+            log.info(LabelUtils.LABEL_FETCH_SUCCESS, userId);
+            return distinctNoteIds;
+        } catch (Exception ex) {
+            log.error(LabelUtils.LABEL_FETCH_ERROR, userId, new LabelsNotFoundException(ex.getMessage()));
+            throw new LabelsNotFoundException(ex.getMessage());
+        }
+    }
+
+    @Transactional
+    public Boolean deleteAllLabelsForNote(Long noteId, Long userId) {
+        try {
+            labelRepository.deleteLabelIdsByNoteId(noteId, userId);
+            return true;
+        } catch (Exception exp) {
+            log.error(LabelUtils.LABEL_DELETE_ERROR);
+            throw new LabelNotDeletedException();
+        }
+    }
 }

@@ -12,4 +12,6 @@ public class LabelUtils {
 	public static final String LABEL_FETCH_ERROR = "Error occurred while fetching labels for user : {} , {}";
 	public static final String LABEL_ALREADY_EXIST_ERROR = "Label already exist : {}";
 
+	public static final String LABEL_NOT_FOUND = "Label not found for user : {}";
+
 }

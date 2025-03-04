@@ -1,6 +1,7 @@
 package com.scribblemate.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,14 +15,14 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface LabelRepository extends JpaRepository<Label, Long> {
 
-	Label findByIdAndUserId(Long id, Long userId);
+    Optional<Label> findByIdAndUserId(Long id, Long userId);
 
     @Query(value = "SELECT * from label WHERE user_id = :userId and label_name = :labelName", nativeQuery = true)
     Label findByUserIdAndLabelName(@Param("userId") Long userId, @Param("labelName") String labelName);
 
     @Transactional
     @Modifying
-    int deleteByIdAndUserId(Long labelId,Long userId);
+    int deleteByIdAndUserId(Long labelId, Long userId);
 
 //	@Transactional
 //	void deleteAllByUser(User user);
@@ -50,6 +51,11 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
     @Transactional
     @Query(value = "DELETE FROM label_note_ids lbn WHERE lbn.label_id = :labelId AND lbn.note_id = :noteId ", nativeQuery = true)
     int deleteLabelFromNote(@Param("labelId") Long labelId, @Param("noteId") Long noteId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE ln FROM label_note_ids ln JOIN label lb ON ln.label_id = lb.id WHERE lb.user_id = :userId AND ln.note_id = :noteId", nativeQuery = true)
+    int deleteLabelIdsByNoteId(@Param("noteId") Long noteId, @Param("userId") Long userId);
 
 
 }

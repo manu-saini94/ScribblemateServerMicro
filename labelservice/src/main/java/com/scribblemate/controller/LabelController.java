@@ -1,8 +1,8 @@
 package com.scribblemate.controller;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.scribblemate.common.dto.NoteLabelDto;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.entities.User;
@@ -22,16 +22,6 @@ public class LabelController {
 
     @Autowired
     private LabelService labelService;
-
-    // Create Api for getting all notes with labels
-
-//    @GetMapping("/labelled")
-//    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllNotesWithLabels(@AuthenticationPrincipal User user) {
-//        List<NoteDto> notesList = noteService.getAllNotesWithLabelsByUser(user);
-//        return ResponseEntity.ok().body(
-//                new SuccessResponse<>(HttpStatus.OK.value(),
-//                        ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
-//    }
 
     @PostMapping("/create")
     public ResponseEntity<SuccessResponse<LabelDto>> createLabel(@RequestBody LabelDto labelDto,
@@ -59,6 +49,14 @@ public class LabelController {
                         ResponseSuccessUtils.LABEL_FETCHING_SUCCESS, labelList));
     }
 
+    @GetMapping("/labelled")
+    public ResponseEntity<SuccessResponse<Set<Long>>> getAllNoteIdsWithLabels(@AuthenticationPrincipal User user) {
+        Set<Long> labelledNoteIds = labelService.getAllNoteIdsWithLabelsByUser(user.getId());
+        return ResponseEntity.ok().body(
+                new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, labelledNoteIds));
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<SuccessResponse<Boolean>> deleteLabelByUser(@RequestParam("id") Long labelId,
                                                                       @AuthenticationPrincipal User user) {
@@ -84,7 +82,6 @@ public class LabelController {
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, noteLabelDto));
-
     }
 
     @PutMapping("/note/{noteId}/assign/{labelId}")
@@ -106,5 +103,14 @@ public class LabelController {
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.LABEL_DELETE_SUCCESS, isAdded));
+    }
+
+    @DeleteMapping("/note/{noteId}/unassign")
+    public ResponseEntity<SuccessResponse<Boolean>> deleteAllLabelsInsideNote(@PathVariable("noteId") Long noteId,
+                                                                             @AuthenticationPrincipal User user) {
+        Boolean isdeleted= labelService.deleteAllLabelsForNote(noteId, user.getId());
+        return ResponseEntity.ok()
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_DELETE_SUCCESS, isdeleted));
     }
 }
