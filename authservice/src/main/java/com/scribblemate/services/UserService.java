@@ -2,7 +2,6 @@ package com.scribblemate.services;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import com.scribblemate.common.utility.ResponseErrorUtils;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.exceptions.UserNotDeletedException;
@@ -17,8 +16,8 @@ import com.scribblemate.common.dto.CollaboratorDto;
 import com.scribblemate.common.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j

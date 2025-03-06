@@ -1,15 +1,12 @@
 package com.scribblemate.services;
 
-import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import com.scribblemate.common.dto.NoteLabelDto;
 import com.scribblemate.common.exceptions.NotAuthorizedException;
 import com.scribblemate.common.utility.ResponseErrorUtils;
-import com.scribblemate.entities.User;
 import com.scribblemate.exceptions.labels.*;
 import com.scribblemate.utility.LabelUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +14,8 @@ import org.springframework.stereotype.Service;
 import com.scribblemate.dto.LabelDto;
 import com.scribblemate.entities.Label;
 import com.scribblemate.repositories.LabelRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service

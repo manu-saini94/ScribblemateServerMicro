@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import com.scribblemate.entities.Note;
 import com.scribblemate.entities.SpecificNote;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 
 @Repository
 public interface SpecificNoteRepository extends JpaRepository<SpecificNote, Long> {
