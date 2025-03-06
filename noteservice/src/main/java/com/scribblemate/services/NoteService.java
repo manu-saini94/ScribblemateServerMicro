@@ -27,8 +27,8 @@ import com.scribblemate.repositories.ListItemsRepository;
 import com.scribblemate.repositories.NoteRepository;
 import com.scribblemate.repositories.SpecificNoteRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
