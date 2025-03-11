@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Random;
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
+import com.scribblemate.common.exceptions.UserAlreadyExistException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.common.services.EmailService;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
@@ -65,7 +66,7 @@ public class AuthenticationService {
                     .setPassword(passwordEncoder.encode(input.getPassword())).setStatus(Utils.Status.ACTIVE);
             User user = userRepository.save(newUser);
             log.info(ResponseSuccessUtils.USER_REGISTRATION_SUCCESS);
-//            kafkaService.publishUserCreatedEvent(user);
+            kafkaService.publishUserCreatedEvent(user);
             return user;
         } catch (Exception exp) {
             log.error(UserUtils.ERROR_PERSISTING_USER, newUser);

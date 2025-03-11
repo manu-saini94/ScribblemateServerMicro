@@ -2,6 +2,7 @@ package com.scribblemate.exceptions;
 
 import com.scribblemate.common.exceptions.TokenExpiredException;
 import com.scribblemate.common.exceptions.TokenMissingOrInvalidException;
+import com.scribblemate.common.exceptions.UserAlreadyExistException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
