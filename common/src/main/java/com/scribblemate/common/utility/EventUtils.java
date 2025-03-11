@@ -13,4 +13,5 @@ public class EventUtils {
     public static final String USER_UPDATE_ERROR_EVENT = "User update error after event consumed";
 
     public static final String USER_DELETE_ERROR_EVENT = "User delete error after event consumed";
+
 }

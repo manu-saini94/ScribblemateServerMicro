@@ -1,4 +1,4 @@
-package com.scribblemate.common.event;
+package com.scribblemate.common.event.note;
 
 import lombok.*;
 

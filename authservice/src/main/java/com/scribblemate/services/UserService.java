@@ -55,7 +55,7 @@ public class UserService {
             User savedUser = userRepository.save(user);
             UserDto userDetailsDto = getUserDtoFromUser(savedUser);
             log.info(ResponseSuccessUtils.USER_PERSIST_SUCCESS);
-//            kafkaService.publishUserUpdatedEvent(savedUser);
+            kafkaService.publishUserUpdatedEvent(savedUser);
             return userDetailsDto;
         } catch (Exception exp) {
             log.error(UserUtils.ERROR_PERSISTING_USER, currentUser, exp.getMessage());
@@ -105,7 +105,7 @@ public class UserService {
                     .orElseThrow(() -> new UserNotFoundException());
             userRepository.delete(user);
             log.info(ResponseSuccessUtils.USER_DELETE_SUCCESS);
-//            kafkaService.publishUserDeletedEvent(user);
+            kafkaService.publishUserDeletedEvent(user);
             return true;
         } catch (Exception exp) {
             log.error(UserUtils.ERROR_DELETING_USER, currentUser, exp.getMessage());

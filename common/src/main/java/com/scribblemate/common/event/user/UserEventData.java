@@ -1,4 +1,4 @@
-package com.scribblemate.common.event;
+package com.scribblemate.common.event.user;
 
 import com.scribblemate.common.utility.Utils;
 import lombok.*;
@@ -18,10 +18,6 @@ public class UserEventData {
     private String email;
 
     private Utils.Status status;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 
     private String profilePicture;
 }

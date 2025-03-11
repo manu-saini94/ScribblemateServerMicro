@@ -3,37 +3,27 @@ package com.scribblemate.services;
 import com.scribblemate.common.event.user.UserEventData;
 import com.scribblemate.common.exceptions.KafkaEventException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
+import com.scribblemate.common.utility.EventUtils;
 import com.scribblemate.common.utility.UserUtils;
 import com.scribblemate.entities.User;
-import com.scribblemate.repositories.NoteRepository;
-import com.scribblemate.repositories.SpecificNoteRepository;
-import com.scribblemate.common.utility.EventUtils;
 import com.scribblemate.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 @Service
 @Slf4j
 public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private SpecificNoteRepository specificNoteRepository;
-
-    @Autowired
-    private NoteRepository noteRepository;
-
     public User setUserFromUserEvent(UserEventData userEventData) {
         User user = new User();
-        user.setFullName(userEventData.getFullName());
-        user.setEmail(userEventData.getEmail());
-        user.setProfilePicture(userEventData.getProfilePicture());
         user.setId(userEventData.getId());
+        user.setEmail(userEventData.getEmail());
         return user;
     }
+
 
     @Transactional
     public void persistUserAfterEvent(UserEventData userEventData) {
@@ -51,14 +41,13 @@ public class UserService {
         }
     }
 
+
     @Transactional
     public void updateUserAfterEvent(UserEventData userEventData) {
         try {
             User user = userRepository.findById(userEventData.getId())
                     .orElseThrow(UserNotFoundException::new);
-            user.setFullName(userEventData.getFullName());
             user.setEmail(userEventData.getEmail());
-            user.setProfilePicture(userEventData.getProfilePicture());
             userRepository.save(user);
             log.info(EventUtils.USER_UPDATE_SUCCESS_EVENT);
         } catch (UserNotFoundException ex) {
@@ -100,5 +89,4 @@ public class UserService {
             throw new KafkaEventException(EventUtils.USER_DELETE_ERROR_EVENT, exp);
         }
     }
-
 }
