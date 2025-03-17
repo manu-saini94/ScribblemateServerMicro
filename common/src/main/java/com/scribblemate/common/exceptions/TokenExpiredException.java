@@ -17,4 +17,7 @@ public class TokenExpiredException extends RuntimeException {
 	public TokenExpiredException(String message) {
 		this.message = message;
 	}
+	public TokenExpiredException(Throwable cause) {
+		super(cause);
+	}
 }

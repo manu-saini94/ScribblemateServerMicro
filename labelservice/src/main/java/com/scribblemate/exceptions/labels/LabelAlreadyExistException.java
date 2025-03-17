@@ -17,4 +17,10 @@ public class LabelAlreadyExistException extends RuntimeException {
 	public LabelAlreadyExistException(String message) {
 		this.message = message;
 	}
+	public LabelAlreadyExistException(Throwable cause){
+		super(cause);
+	}
+	public LabelAlreadyExistException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

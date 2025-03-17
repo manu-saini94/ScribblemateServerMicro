@@ -1,7 +1,6 @@
 package com.scribblemate.configuration;
 
 import com.scribblemate.common.event.label.LabelEventData;
-import com.scribblemate.common.event.note.NoteEventData;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.LongSerializer;

@@ -18,4 +18,10 @@ public class LabelNotPersistedException extends RuntimeException {
 	public LabelNotPersistedException(String message) {
 		this.message = message;
 	}
+	public LabelNotPersistedException(Throwable cause){
+		super(cause);
+	}
+	public LabelNotPersistedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

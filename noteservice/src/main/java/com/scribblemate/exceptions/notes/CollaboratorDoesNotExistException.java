@@ -17,4 +17,7 @@ public class CollaboratorDoesNotExistException extends RuntimeException {
 	public CollaboratorDoesNotExistException(String message) {
 		this.message = message;
 	}
+	public CollaboratorDoesNotExistException(Throwable cause) {
+		super(cause);
+	}
 }

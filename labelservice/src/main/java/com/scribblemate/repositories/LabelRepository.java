@@ -2,6 +2,8 @@ package com.scribblemate.repositories;
 
 import java.util.Optional;
 import java.util.Set;
+
+import com.scribblemate.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -55,6 +57,10 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
     @Transactional
     @Query(value = "DELETE ln FROM label_note_ids ln JOIN label lb ON ln.label_id = lb.id WHERE lb.user_id = :userId AND ln.note_id = :noteId", nativeQuery = true)
     int deleteLabelIdsByNoteId(@Param("noteId") Long noteId, @Param("userId") Long userId);
+
+    @Modifying
+    @Transactional
+    int deleteAllByUser(User user);
 
 
 }

@@ -19,6 +19,9 @@ public class KafkaEventException extends RuntimeException {
     public KafkaEventException(String message) {
         this.message = message;
     }
+    public KafkaEventException(Throwable cause) {
+        super(cause);
+    }
 
     public KafkaEventException(String message, Throwable cause) {
         super(message, cause);

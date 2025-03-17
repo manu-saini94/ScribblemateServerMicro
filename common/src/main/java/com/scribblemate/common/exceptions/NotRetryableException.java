@@ -23,5 +23,7 @@ public class NotRetryableException extends RuntimeException{
         super(message, cause);
     }
 
-
+    public NotRetryableException(Throwable cause) {
+        super(cause);
+    }
 }

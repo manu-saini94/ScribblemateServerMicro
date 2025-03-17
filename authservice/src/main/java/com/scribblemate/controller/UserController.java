@@ -2,13 +2,13 @@ package com.scribblemate.controller;
 
 import java.util.List;
 import com.scribblemate.annotation.LoadUserContext;
+import com.scribblemate.common.dto.CollaboratorDto;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import com.scribblemate.common.dto.CollaboratorDto;
 import com.scribblemate.common.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.common.responses.SuccessResponse;

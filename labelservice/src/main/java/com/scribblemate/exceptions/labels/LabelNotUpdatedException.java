@@ -12,4 +12,7 @@ public class LabelNotUpdatedException extends RuntimeException {
 	public LabelNotUpdatedException(String message) {
 		this.message = message;
 	}
+	public LabelNotUpdatedException(Throwable cause){
+		super(cause);
+	}
 }

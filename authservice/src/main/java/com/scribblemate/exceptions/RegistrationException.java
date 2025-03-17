@@ -17,4 +17,7 @@ public class RegistrationException extends RuntimeException {
 	public RegistrationException(String message) {
 		this.message = message;
 	}
+	public RegistrationException(Throwable cause) {
+		super(cause);
+	}
 }

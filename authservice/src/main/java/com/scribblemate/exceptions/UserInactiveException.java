@@ -17,4 +17,7 @@ public class UserInactiveException extends RuntimeException {
 	public UserInactiveException(String message) {
 		this.message = message;
 	}
+	public UserInactiveException(Throwable cause) {
+		super(cause);
+	}
 }

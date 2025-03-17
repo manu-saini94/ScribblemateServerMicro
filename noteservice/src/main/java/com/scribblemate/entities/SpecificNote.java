@@ -1,7 +1,9 @@
 package com.scribblemate.entities;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
+
 import com.scribblemate.common.utility.Utils;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,8 +27,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "specific_note", indexes = { @Index(name = "index_user", columnList = "userId"),
-		@Index(name = "index_common_note", columnList = "commonNoteId") })
+@Table(name = "specific_note", indexes = {@Index(name = "index_user", columnList = "userId"),
+        @Index(name = "index_common_note", columnList = "commonNoteId")})
 @Getter
 @Setter
 @SuperBuilder
@@ -35,31 +37,38 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners(AuditingEntityListener.class)
 public class SpecificNote extends CommonFields {
 
-	@Column(name = "color")
-	private String color;
+    @Column(name = "color")
+    private String color;
 
-	@Column(name = "is_pinned")
-	@JsonProperty(value = "isPinned")
-	private boolean isPinned;
+    @Column(name = "is_pinned")
+    @JsonProperty(value = "isPinned")
+    private boolean isPinned;
 
-	@Column(name = "is_archived")
-	@JsonProperty(value = "isArchived")
-	private boolean isArchived;
+    @Column(name = "is_archived")
+    @JsonProperty(value = "isArchived")
+    private boolean isArchived;
 
-	@Column(name = "is_trashed")
-	@JsonProperty(value = "isTrashed")
-	private boolean isTrashed;
+    @Column(name = "is_trashed")
+    @JsonProperty(value = "isTrashed")
+    private boolean isTrashed;
 
-	@Column(name = "reminder")
-	private LocalDateTime reminder;
+    @Column(name = "reminder")
+    private LocalDateTime reminder;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "role")
-	private Utils.Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Utils.Role role;
 
-	private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-	@ManyToOne
-	private Note commonNote;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @JoinTable(name = "note_label", joinColumns = { @JoinColumn(name = "note_id") }, inverseJoinColumns = {
+            @JoinColumn(name = "label_id") })
+    private Set<Label> labelSet = new HashSet<>();
+
+    @ManyToOne
+    private Note commonNote;
 
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @FeignClient(name = "label-service",
@@ -22,7 +23,7 @@ import java.util.List;
 public interface LabelClient {
 
     @PutMapping("/note/{noteId}/assign")
-    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody List<Long> labelIds,
+    public ResponseEntity<SuccessResponse<NoteLabelDto>> addLabelListToNote(@RequestBody Set<Long> labelIds,
                                                                             @PathVariable("noteId") Long noteId);
 
     @DeleteMapping("/note/{noteId}/unassign")

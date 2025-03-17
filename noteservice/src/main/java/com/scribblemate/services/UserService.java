@@ -4,6 +4,7 @@ import com.scribblemate.common.event.user.UserEventData;
 import com.scribblemate.common.exceptions.KafkaEventException;
 import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.common.utility.UserUtils;
+import com.scribblemate.entities.SpecificNote;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.NoteRepository;
 import com.scribblemate.repositories.SpecificNoteRepository;
@@ -13,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -75,26 +78,14 @@ public class UserService {
         try {
             User user = userRepository.findById(userEventData.getId())
                     .orElseThrow(UserNotFoundException::new);
-//            if (!user.getLabelSet().isEmpty()) {
-//                user.getLabelSet().forEach(label -> specificNoteRepository.deleteLabelsFromLabelNote(label.getId()));
-//            }
-//            labelRepository.deleteAllByUser(user);
-//            user.getNoteList().forEach(note -> {
-//                if (!note.getCollaboratorList().isEmpty()) {
-//                    List<User> userList = note.getCollaboratorList().stream().filter(item -> !item.equals(user))
-//                            .toList();
-//                    note.setCollaboratorList(userList);
-//                }
-//                if (!note.getSpecificNoteList().isEmpty()) {
-//                    List<SpecificNote> noteList = note.getSpecificNoteList().stream()
-//                            .filter(item -> !item.getUser().equals(user)).toList();
-//                    note.setSpecificNoteList(noteList);
-//                }
-//                noteRepository.save(note);
-//            });
-//            user.getLabelSet().clear();
+            userRepository.removeUserFromCollaboratorList(user.getId());
+            //might need to check for createdBy and updatedBy for removal of user reference there too.
+            specificNoteRepository.deleteAllByUser(user);
             userRepository.delete(user);
             log.info(EventUtils.USER_DELETE_SUCCESS_EVENT);
+        } catch (UserNotFoundException ex) {
+            log.error(UserUtils.ERROR_USER_NOT_FOUND);
+            return;
         } catch (Exception exp) {
             log.error(EventUtils.USER_DELETE_ERROR_EVENT);
             throw new KafkaEventException(EventUtils.USER_DELETE_ERROR_EVENT, exp);

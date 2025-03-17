@@ -1,6 +1,7 @@
 package com.scribblemate.configuration;
 
-import com.scribblemate.common.event.note.NoteEventData;
+import com.scribblemate.common.event.note.NoteLabelEventData;
+import com.scribblemate.common.event.note.NoteLabelIdsEventData;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.LongSerializer;
@@ -21,12 +22,6 @@ public class KafkaProducerConfiguration {
 
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String bootstrapServers;
-
-    @Value("${spring.kafka.producer.key-serializer}")
-    private String keySerializer;
-
-    @Value("${spring.kafka.producer.value-serializer}")
-    private String valueSerializer;
 
     @Value("${spring.kafka.producer.acks}")
     private String acks;
@@ -62,16 +57,25 @@ public class KafkaProducerConfiguration {
     }
 
     @Bean
-    ProducerFactory<Long, NoteEventData> producerFactory() {
+    ProducerFactory<Long, NoteLabelIdsEventData> labelIdsProducerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    KafkaTemplate<Long, NoteEventData> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    KafkaTemplate<Long, NoteLabelIdsEventData> labelIdsKafkaTemplate() {
+        return new KafkaTemplate<>(labelIdsProducerFactory());
+    }
+
+
+    @Bean
+    ProducerFactory<Long, NoteLabelEventData> labelProducerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
+    KafkaTemplate<Long, NoteLabelEventData> labelKafkaTemplate() {
+        return new KafkaTemplate<>(labelProducerFactory());
+    }
     NewTopic createTopicNoteCreated() {
         return TopicBuilder.name("NOTE_CREATED")
                 .partitions(3)
@@ -92,6 +96,33 @@ public class KafkaProducerConfiguration {
     @Bean
     NewTopic createTopicNoteDeleted() {
         return TopicBuilder.name("NOTE_DELETED")
+                .partitions(3)
+                .replicas(3)
+                .configs(Map.of("min.insync.replicas", "2"))
+                .build();
+    }
+
+    @Bean
+    NewTopic createTopicLabelIdsAssigned() {
+        return TopicBuilder.name("NOTE_LABELS_ASSIGNED")
+                .partitions(3)
+                .replicas(3)
+                .configs(Map.of("min.insync.replicas", "2"))
+                .build();
+    }
+
+    @Bean
+    NewTopic createTopicLabelAssigned() {
+        return TopicBuilder.name("NOTE_LABEL_ASSIGNED")
+                .partitions(3)
+                .replicas(3)
+                .configs(Map.of("min.insync.replicas", "2"))
+                .build();
+    }
+
+    @Bean
+    NewTopic createTopicLabelUnassigned() {
+        return TopicBuilder.name("NOTE_LABEL_UNASSIGNED")
                 .partitions(3)
                 .replicas(3)
                 .configs(Map.of("min.insync.replicas", "2"))

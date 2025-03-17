@@ -1,6 +1,8 @@
 package com.scribblemate.controller;
 
 import java.util.List;
+import java.util.Set;
+
 import com.scribblemate.common.responses.SuccessResponse;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.entities.User;
@@ -41,7 +43,7 @@ public class NoteController {
     @GetMapping("/fetch")
     public ResponseEntity<SuccessResponse<NoteDto>> getNote(@RequestParam("noteId") Long noteId,
                                                             @AuthenticationPrincipal User user) {
-        NoteDto note = noteService.getNoteById(user.getId(), noteId);
+        NoteDto note = noteService.getNoteById(user, noteId);
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, note));
@@ -116,21 +118,51 @@ public class NoteController {
                         ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
     }
 
-    @PutMapping("/assign/{noteId}/collaborator/{collaboratorId}")
-    public ResponseEntity<SuccessResponse> addCollaboratorToNote(@PathVariable("collaboratorId") Long collaboratorId,
+    @GetMapping("/labelled")
+    public ResponseEntity<SuccessResponse<List<NoteDto>>> getAllNoteIdsWithLabels(@AuthenticationPrincipal User user) {
+        List<NoteDto> notesList = noteService.getAllNotesWithLabelsByUser(user.getId());
+        return ResponseEntity.ok().body(
+                new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.NOTE_FETCHING_SUCCESS, notesList));
+    }
+
+    @PutMapping("/label/{noteId}/assign/{labelId}")
+    public ResponseEntity<SuccessResponse<NoteDto>> addLabelToNote(@PathVariable("labelId") Long labelId,
+                                                                   @PathVariable("noteId") Long noteId,
+                                                                   @AuthenticationPrincipal User user) {
+        NoteDto noteDto = noteService.addLabelToNote(labelId, noteId, user.getId());
+        return ResponseEntity.ok()
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, noteDto));
+
+    }
+
+    @DeleteMapping("/label/{noteId}/unassign/{labelId}")
+    public ResponseEntity<SuccessResponse<NoteDto>> deleteLabelInsideNote(@PathVariable("labelId") Long labelId,
+                                                                          @PathVariable("noteId") Long noteId,
+                                                                          @AuthenticationPrincipal User user) {
+        NoteDto noteDto = noteService.deleteLabelFromNote(labelId, noteId, user.getId());
+        return ResponseEntity.ok()
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        ResponseSuccessUtils.LABEL_DELETE_SUCCESS, noteDto));
+    }
+
+
+    @PutMapping("/assign/{noteId}/collaborator/{collaboratorEmail}")
+    public ResponseEntity<SuccessResponse> addCollaboratorToNote(@PathVariable("collaboratorEmail") String collaboratorEmail,
                                                                  @PathVariable("noteId") Long noteId,
                                                                  @AuthenticationPrincipal User user) {
-        NoteDto note = noteService.addCollaboratorToNote(user.getId(), noteId, collaboratorId);
+        NoteDto note = noteService.addCollaboratorToNote(user.getId(), noteId, collaboratorEmail);
         return ResponseEntity.ok()
                 .body(new SuccessResponse(HttpStatus.OK.value(),
                         ResponseSuccessUtils.NOTE_UPDATE_SUCCESS, note));
     }
 
-    @DeleteMapping("/unassign/{noteId}/collaborator/{collaboratorId}")
-    public ResponseEntity<SuccessResponse> removeCollaboratorFromNote(@PathVariable("collaboratorId") Long collaboratorId,
+    @DeleteMapping("/unassign/{noteId}/collaborator/{collaboratorEmail}")
+    public ResponseEntity<SuccessResponse> removeCollaboratorFromNote(@PathVariable("collaboratorEmail") String collaboratorEmail,
                                                                       @PathVariable("noteId") Long noteId,
                                                                       @AuthenticationPrincipal User user) {
-        NoteDto note = noteService.deleteCollaboratorFromNote(user.getId(), noteId, collaboratorId);
+        NoteDto note = noteService.deleteCollaboratorFromNote(user.getId(), noteId, collaboratorEmail);
         return ResponseEntity.ok().body(
                 new SuccessResponse(HttpStatus.OK.value(),
                         ResponseSuccessUtils.COLLABORATOR_DELETE_SUCCESS, note));

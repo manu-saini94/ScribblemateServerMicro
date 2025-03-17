@@ -3,6 +3,7 @@ package com.scribblemate.repositories;
 import java.util.List;
 import java.util.Optional;
 
+import com.scribblemate.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,19 +20,20 @@ public interface SpecificNoteRepository extends JpaRepository<SpecificNote, Long
 
     Optional<SpecificNote> findById(Long id);
 
-    Optional<SpecificNote> findByIdAndUserId(Long noteId, Long userId);
+    Optional<SpecificNote> findByIdAndUser(Long id, User user);
 
-    List<SpecificNote> findAllByUserIdAndIsTrashedFalseAndIsArchivedFalseOrderByCommonNoteCreatedAtDesc(Long userId);
+    List<SpecificNote> findAllByUserAndIsTrashedFalseAndIsArchivedFalseOrderByCommonNoteCreatedAtDesc(User user);
 
-    List<SpecificNote> findAllByUserIdOrderByCommonNoteCreatedAtDesc(Long userId);
 
-    SpecificNote findByCommonNoteAndUserId(Note note, Long userId);
+    List<SpecificNote> findAllByUserOrderByCommonNoteCreatedAtDesc(User user);
 
-    List<SpecificNote> findAllByUserIdAndIsTrashedTrueOrderByUpdatedAtDesc(Long userId);
+    SpecificNote findByCommonNoteAndUser(Note note, User collaborator);
 
-    List<SpecificNote> findAllByUserIdAndIsArchivedTrueOrderByCommonNoteCreatedAtDesc(Long userId);
+    List<SpecificNote> findAllByUserAndIsTrashedTrueOrderByUpdatedAtDesc(User user);
 
-    List<SpecificNote> findAllByUserIdAndReminderNotNullOrderByCommonNoteCreatedAtDesc(Long userId);
+    List<SpecificNote> findAllByUserAndIsArchivedTrueOrderByCommonNoteCreatedAtDesc(User user);
+
+    List<SpecificNote> findAllByUserAndReminderNotNullOrderByCommonNoteCreatedAtDesc(User user);
 
     List<SpecificNote> findAllByCommonNote(Note commonNote);
 
@@ -41,14 +43,30 @@ public interface SpecificNoteRepository extends JpaRepository<SpecificNote, Long
     void deleteByCommonNoteIdAndUserId(@Param("commonNoteId") Long commonNoteId, @Param("userId") Long userId);
 
     @Transactional
-    void deleteByCommonNoteAndUserId(Note commonNote, Long userId);
-
-    @Transactional
-    void deleteAllByUserId(Long userId);
+    @Modifying
+    @Query(value = "DELETE from note_label WHERE label_id = :labelId", nativeQuery = true)
+    int deleteLabelsFromLabelNote(@Param("labelId") Long labelId);
 
     @Transactional
     @Modifying
-    int deleteByIdAndUserId(Long noteId, Long userId);
+    @Query(value = "DELETE from note_label WHERE note_id = :noteId", nativeQuery = true)
+    void deleteAllByNoteId(@Param("noteId") Long noteId);
 
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE from note_user WHERE user_id = :userId and note_id = :noteId ", nativeQuery = true)
+    void deleteCollaboratorByUserIdAndCommonNoteId(@Param("userId") Long userId, @Param("noteId") Long noteId);
+
+    @Transactional
+    @Modifying
+    int deleteByIdAndUser(Long id, User user);
+
+    @Transactional
+    @Modifying
+    int deleteByCommonNoteAndUser(Note commonNote, User user);
+
+    @Transactional
+    @Modifying
+    int deleteAllByUser(User user);
 
 }

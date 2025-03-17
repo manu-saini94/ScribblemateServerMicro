@@ -17,4 +17,8 @@ public class UserNotDeletedException extends RuntimeException {
 	public UserNotDeletedException(String message) {
 		this.message = message;
 	}
+
+	public UserNotDeletedException(Throwable cause) {
+		super(cause);
+	}
 }

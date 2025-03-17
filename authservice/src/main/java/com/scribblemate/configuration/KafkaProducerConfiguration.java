@@ -1,6 +1,5 @@
 package com.scribblemate.configuration;
 
-import com.scribblemate.common.event.note.NoteEventData;
 import com.scribblemate.common.event.user.UserEventData;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;

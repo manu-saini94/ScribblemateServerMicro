@@ -17,4 +17,7 @@ public class TokenMissingOrInvalidException extends RuntimeException {
 	public TokenMissingOrInvalidException(String message) {
 		this.message = message;
 	}
+	public TokenMissingOrInvalidException(Throwable cause) {
+		super(cause);
+	}
 }
