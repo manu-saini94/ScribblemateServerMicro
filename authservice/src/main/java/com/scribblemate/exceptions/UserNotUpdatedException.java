@@ -17,4 +17,7 @@ public class UserNotUpdatedException extends RuntimeException {
     public UserNotUpdatedException(String message) {
         this.message = message;
     }
+    public UserNotUpdatedException(Throwable cause) {
+        super(cause);
+    }
 }

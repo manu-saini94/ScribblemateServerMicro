@@ -1,5 +1,7 @@
 package com.scribblemate.dto;
 
+import com.scribblemate.common.dto.CollaboratorDto;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -32,11 +34,10 @@ public class NoteDto {
 
     private Long updatedBy;
 
-    private Set<Long> labelIds;
-
+    private Set<Long> labelSet;
     private List<ListItemsDto> listItems;
 
-    private Set<Long> collaboratorIds;
+    private List<CollaboratorDto> collaboratorList;
 
 //    @JsonIgnore
 //    private User user;
@@ -129,14 +130,6 @@ public class NoteDto {
         this.updatedAt = updatedAt;
     }
 
-    public Set<Long> getCollaboratorIds() {
-        return collaboratorIds;
-    }
-
-    public void setCollaboratorIds(Set<Long> collaboratorIds) {
-        this.collaboratorIds = collaboratorIds;
-    }
-
     public List<ListItemsDto> getListItems() {
         return listItems;
     }
@@ -161,22 +154,31 @@ public class NoteDto {
         return updatedBy;
     }
 
-    public Set<Long> getLabelIds() {
-        return labelIds;
-    }
-
-    public void setLabelIds(Set<Long> labelIds) {
-        this.labelIds = labelIds;
-    }
 
     public void setUpdatedBy(Long updatedBy) {
         this.updatedBy = updatedBy;
     }
 
+    public List<CollaboratorDto> getCollaboratorList() {
+        return collaboratorList;
+    }
+
+    public void setCollaboratorList(List<CollaboratorDto> collaboratorList) {
+        this.collaboratorList = collaboratorList;
+    }
+
+    public Set<Long> getLabelSet() {
+        return labelSet;
+    }
+
+    public void setLabelSet(Set<Long> labelSet) {
+        this.labelSet = labelSet;
+    }
+
     public NoteDto(Long id, String title, String content, List<String> images, boolean isTrashed, boolean isArchived,
                    boolean isPinned, String color, LocalDateTime reminder, LocalDateTime createdAt,
-                   LocalDateTime updatedAt, Long createdBy, Long updatedBy, Set<Long> labelIds,
-                   List<ListItemsDto> listItems, Set<Long> collaboratorIds) {
+                   LocalDateTime updatedAt, Long createdBy, Long updatedBy, Set<Long> labelSet,
+                   List<ListItemsDto> listItems, List<CollaboratorDto> collaboratorList) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -190,8 +192,30 @@ public class NoteDto {
         this.updatedAt = updatedAt;
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
-        this.labelIds = labelIds;
+        this.labelSet = labelSet;
         this.listItems = listItems;
-        this.collaboratorIds = collaboratorIds;
+        this.collaboratorList = collaboratorList;
+    }
+
+    @Override
+    public String toString() {
+        return "NoteDto{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", images=" + images +
+                ", isTrashed=" + isTrashed +
+                ", isArchived=" + isArchived +
+                ", isPinned=" + isPinned +
+                ", color='" + color + '\'' +
+                ", reminder=" + reminder +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", createdBy=" + createdBy +
+                ", updatedBy=" + updatedBy +
+                ", labelSet=" + labelSet +
+                ", listItems=" + listItems +
+                ", collaboratorList=" + collaboratorList +
+                '}';
     }
 }

@@ -33,10 +33,13 @@ public class Note extends CommonFields {
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> images = new ArrayList<>();
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "note_user_ids", joinColumns = @JoinColumn(name = "note_id"))
-	@Column(name = "user_id")
-	private Set<Long> userIds = new HashSet<>();
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "note_user",
+			joinColumns = @JoinColumn(name = "note_id"),
+			inverseJoinColumns = @JoinColumn(name = "user_id")
+	)
+	private List<User> collaboratorList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "commonNote", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private List<SpecificNote> specificNoteList = new ArrayList<>();

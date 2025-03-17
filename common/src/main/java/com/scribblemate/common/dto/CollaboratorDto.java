@@ -11,10 +11,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CollaboratorDto {
 
-	private Long id;
+    private Long id;
 
-	private String name;
+    private String name;
 
-	private String email;
+    private String email;
 
 }

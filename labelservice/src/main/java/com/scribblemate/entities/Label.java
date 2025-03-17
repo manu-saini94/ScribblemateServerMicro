@@ -3,6 +3,7 @@ package com.scribblemate.entities;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
 import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,7 +35,9 @@ public class Label extends CommonFields {
     @Column(name = "note_id")
     private Set<Long> noteIds = new HashSet<>();
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Override
     public int hashCode() {
@@ -53,4 +56,12 @@ public class Label extends CommonFields {
         return Objects.equals(labelName, other.labelName);
     }
 
+    @Override
+    public String toString() {
+        return "Label{" +
+                "labelName='" + labelName + '\'' +
+                ", isImportant=" + isImportant +
+                ", user=" + user +
+                '}';
+    }
 }

@@ -5,20 +5,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NotAuthorizedException extends RuntimeException {
+public class LabelsNotFoundException extends RuntimeException{
     private static final long serialVersionUID = 1L;
 
     private String message;
 
-    public NotAuthorizedException() {
+    public LabelsNotFoundException() {
         super();
     }
 
-    public NotAuthorizedException(String message) {
+    public LabelsNotFoundException(String message) {
         this.message = message;
     }
-    public NotAuthorizedException(Throwable cause) {
+
+    public LabelsNotFoundException(Throwable cause) {
         super(cause);
     }
-
 }

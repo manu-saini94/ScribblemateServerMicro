@@ -52,7 +52,7 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private KafkaService kafkaService;
+    private KafkaProducerService kafkaService;
     @Autowired
     private AuthenticationManager authenticationManager;
 

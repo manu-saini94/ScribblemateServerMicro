@@ -18,4 +18,7 @@ public class NoteNotDeletedException extends RuntimeException {
 	public NoteNotDeletedException(String message) {
 		this.message = message;
 	}
+	public NoteNotDeletedException(Throwable cause) {
+		super(cause);
+	}
 }

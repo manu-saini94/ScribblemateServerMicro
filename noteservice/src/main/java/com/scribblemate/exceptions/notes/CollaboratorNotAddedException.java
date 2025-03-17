@@ -17,5 +17,7 @@ public class CollaboratorNotAddedException extends RuntimeException {
 	public CollaboratorNotAddedException(String message) {
 		this.message = message;
 	}
-
+	public CollaboratorNotAddedException(Throwable cause) {
+		super(cause);
+	}
 }

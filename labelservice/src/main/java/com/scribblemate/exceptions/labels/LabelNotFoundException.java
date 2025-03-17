@@ -17,4 +17,10 @@ public class LabelNotFoundException extends RuntimeException {
 	public LabelNotFoundException(String message) {
 		this.message = message;
 	}
+	public LabelNotFoundException(Throwable cause){
+		super(cause);
+	}
+	public LabelNotFoundException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

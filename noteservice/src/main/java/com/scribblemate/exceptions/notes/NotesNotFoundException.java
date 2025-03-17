@@ -17,4 +17,7 @@ public class NotesNotFoundException extends RuntimeException {
 	public NotesNotFoundException(String message) {
 		this.message = message;
 	}
+	public NotesNotFoundException(Throwable cause) {
+		super(cause);
+	}
 }

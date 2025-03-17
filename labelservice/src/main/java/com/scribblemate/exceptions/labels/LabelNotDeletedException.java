@@ -17,4 +17,10 @@ public class LabelNotDeletedException extends RuntimeException {
 	public LabelNotDeletedException(String message) {
 		this.message = message;
 	}
+	public LabelNotDeletedException(Throwable cause){
+		super(cause);
+	}
+	public LabelNotDeletedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

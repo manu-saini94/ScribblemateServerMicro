@@ -12,4 +12,8 @@ public class UsersFetchException extends RuntimeException {
     public UsersFetchException(String message) {
         this.message = message;
     }
+
+    public UsersFetchException(Throwable cause) {
+        super(cause);
+    }
 }

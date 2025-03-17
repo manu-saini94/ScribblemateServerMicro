@@ -17,5 +17,8 @@ public class CollaboratorAlreadyExistException extends RuntimeException {
 	public CollaboratorAlreadyExistException(String message) {
 		this.message = message;
 	}
+	public CollaboratorAlreadyExistException(Throwable cause) {
+		super(cause);
+	}
 
 }

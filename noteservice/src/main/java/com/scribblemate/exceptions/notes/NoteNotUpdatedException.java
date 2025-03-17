@@ -17,4 +17,7 @@ public class NoteNotUpdatedException extends RuntimeException {
 	public NoteNotUpdatedException(String message) {
 		this.message = message;
 	}
+	public NoteNotUpdatedException(Throwable cause) {
+		super(cause);
+	}
 }

@@ -18,5 +18,7 @@ public class NoteNotPersistedException extends RuntimeException {
 	public NoteNotPersistedException(String message) {
 		this.message = message;
 	}
-
+	public NoteNotPersistedException(Throwable cause) {
+		super(cause);
+	}
 }

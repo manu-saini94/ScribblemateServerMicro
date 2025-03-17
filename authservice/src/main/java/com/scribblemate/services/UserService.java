@@ -2,6 +2,8 @@ package com.scribblemate.services;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.scribblemate.common.dto.CollaboratorDto;
 import com.scribblemate.common.utility.ResponseErrorUtils;
 import com.scribblemate.common.utility.ResponseSuccessUtils;
 import com.scribblemate.exceptions.UserNotDeletedException;
@@ -12,7 +14,6 @@ import com.scribblemate.exceptions.UsersFetchException;
 import com.scribblemate.common.utility.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.scribblemate.common.dto.CollaboratorDto;
 import com.scribblemate.common.dto.UserDto;
 import com.scribblemate.entities.User;
 import com.scribblemate.repositories.UserRepository;
@@ -30,7 +31,7 @@ public class UserService {
     private JwtAuthenticationService jwtService;
 
     @Autowired
-    private KafkaService kafkaService;
+    private KafkaProducerService kafkaService;
 
     public List<UserDto> getAllUsers() {
         try {
@@ -90,7 +91,6 @@ public class UserService {
             User savedUser = userRepository.save(user);
             UserDto userDetailsDto = getUserDtoFromUser(savedUser);
             log.info(ResponseSuccessUtils.USER_ACTIVATE_SUCCESS);
-//            kafkaService.publishUserUpdatedEvent(savedUser);
             return userDetailsDto;
         } catch (Exception exp) {
             log.error(UserUtils.ERROR_PERSISTING_USER, currentUser, exp.getMessage());

@@ -17,5 +17,7 @@ public class CollaboratorNotDeletedException extends RuntimeException {
 	public CollaboratorNotDeletedException(String message) {
 		this.message = message;
 	}
-
+	public CollaboratorNotDeletedException(Throwable cause) {
+		super(cause);
+	}
 }

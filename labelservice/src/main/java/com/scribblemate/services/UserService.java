@@ -6,6 +6,7 @@ import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.common.utility.EventUtils;
 import com.scribblemate.common.utility.UserUtils;
 import com.scribblemate.entities.User;
+import com.scribblemate.repositories.LabelRepository;
 import com.scribblemate.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LabelRepository labelRepository;
 
     public User setUserFromUserEvent(UserEventData userEventData) {
         User user = new User();
@@ -64,24 +68,7 @@ public class UserService {
         try {
             User user = userRepository.findById(userEventData.getId())
                     .orElseThrow(UserNotFoundException::new);
-//            if (!user.getLabelSet().isEmpty()) {
-//                user.getLabelSet().forEach(label -> specificNoteRepository.deleteLabelsFromLabelNote(label.getId()));
-//            }
-//            labelRepository.deleteAllByUser(user);
-//            user.getNoteList().forEach(note -> {
-//                if (!note.getCollaboratorList().isEmpty()) {
-//                    List<User> userList = note.getCollaboratorList().stream().filter(item -> !item.equals(user))
-//                            .toList();
-//                    note.setCollaboratorList(userList);
-//                }
-//                if (!note.getSpecificNoteList().isEmpty()) {
-//                    List<SpecificNote> noteList = note.getSpecificNoteList().stream()
-//                            .filter(item -> !item.getUser().equals(user)).toList();
-//                    note.setSpecificNoteList(noteList);
-//                }
-//                noteRepository.save(note);
-//            });
-//            user.getLabelSet().clear();
+            labelRepository.deleteAllByUser(user);
             userRepository.delete(user);
             log.info(EventUtils.USER_DELETE_SUCCESS_EVENT);
         } catch (Exception exp) {

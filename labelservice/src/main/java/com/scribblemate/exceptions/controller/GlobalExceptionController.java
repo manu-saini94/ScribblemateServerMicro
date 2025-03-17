@@ -1,6 +1,8 @@
 package com.scribblemate.exceptions.controller;
 
+import com.scribblemate.common.exceptions.LabelsNotFoundException;
 import com.scribblemate.common.exceptions.NotAuthorizedException;
+import com.scribblemate.common.exceptions.UserNotFoundException;
 import com.scribblemate.exceptions.labels.*;
 import com.scribblemate.common.utility.ResponseErrorUtils;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,12 @@ public class GlobalExceptionController {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, ResponseErrorUtils.NOT_AUTHORIZED_TO_ACCESS,
                 exp.getMessage());
     }
+
+    @ExceptionHandler(value = UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException exp) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ResponseErrorUtils.USER_NOT_FOUND, exp.getMessage());
+    }
+
 
     @ExceptionHandler(value = LabelNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleLabelNotFoundException(LabelNotFoundException exp) {
