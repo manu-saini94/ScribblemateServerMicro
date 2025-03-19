@@ -130,7 +130,7 @@ public class NoteController {
     public ResponseEntity<SuccessResponse<NoteDto>> addLabelToNote(@PathVariable("labelId") Long labelId,
                                                                    @PathVariable("noteId") Long noteId,
                                                                    @AuthenticationPrincipal User user) {
-        NoteDto noteDto = noteService.addLabelToNote(labelId, noteId, user.getId());
+        NoteDto noteDto = noteService.addLabelToNote( user.getId(), noteId,labelId);
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.LABEL_UPDATE_SUCCESS, noteDto));
@@ -141,7 +141,7 @@ public class NoteController {
     public ResponseEntity<SuccessResponse<NoteDto>> deleteLabelInsideNote(@PathVariable("labelId") Long labelId,
                                                                           @PathVariable("noteId") Long noteId,
                                                                           @AuthenticationPrincipal User user) {
-        NoteDto noteDto = noteService.deleteLabelFromNote(labelId, noteId, user.getId());
+        NoteDto noteDto = noteService.deleteLabelFromNote( user.getId(), noteId,labelId);
         return ResponseEntity.ok()
                 .body(new SuccessResponse<>(HttpStatus.OK.value(),
                         ResponseSuccessUtils.LABEL_DELETE_SUCCESS, noteDto));

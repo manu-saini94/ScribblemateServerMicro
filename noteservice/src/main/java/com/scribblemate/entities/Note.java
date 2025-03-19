@@ -33,7 +33,7 @@ public class Note extends CommonFields {
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> images = new ArrayList<>();
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "note_user",
 			joinColumns = @JoinColumn(name = "note_id"),

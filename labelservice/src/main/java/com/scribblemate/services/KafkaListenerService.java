@@ -1,5 +1,6 @@
 package com.scribblemate.services;
 
+import com.scribblemate.common.event.note.NoteEventData;
 import com.scribblemate.common.event.note.NoteLabelEventData;
 import com.scribblemate.common.event.note.NoteLabelIdsEventData;
 import com.scribblemate.common.event.user.UserEventData;
@@ -63,6 +64,18 @@ public class KafkaListenerService {
         String decodedKey = StringEscapeUtils.unescapeJava(key);
         log.info("Message Headers( key : " + decodedKey + "user_email : " + userEmail + " )");
         userService.deleteUserAfterEvent(userData);
+    }
+
+    @KafkaListener(topics = "NOTE_DELETED", groupId = "${spring.kafka.consumer.group-id}")
+    @Transactional
+    public void listenForNoteDeletion(@Payload ConsumerRecord<String, String> consumerRecord,
+                                      @Header("user_email") String userEmail,
+                                      @Header(KafkaHeaders.RECEIVED_KEY) String key) {
+        NoteEventData noteData = EventUtils.getEventDataFromJson(consumerRecord.value(), NoteEventData.class);
+        EventUtils.logEventData(noteData, Utils.KafkaEvent.NOTE_DELETED);
+        String decodedKey = StringEscapeUtils.unescapeJava(key);
+        log.info("Message Headers( key : " + decodedKey + "user_email : " + userEmail + " )");
+        labelService.deleteNoteAfterEvent(noteData,userEmail);
     }
 
     @KafkaListener(topics = "NOTE_LABELS_ASSIGNED", groupId = "${spring.kafka.consumer.group-id}")

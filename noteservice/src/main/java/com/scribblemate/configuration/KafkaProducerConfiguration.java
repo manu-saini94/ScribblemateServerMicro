@@ -1,5 +1,6 @@
 package com.scribblemate.configuration;
 
+import com.scribblemate.common.event.note.NoteEventData;
 import com.scribblemate.common.event.note.NoteLabelEventData;
 import com.scribblemate.common.event.note.NoteLabelIdsEventData;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -76,6 +77,18 @@ public class KafkaProducerConfiguration {
     KafkaTemplate<Long, NoteLabelEventData> labelKafkaTemplate() {
         return new KafkaTemplate<>(labelProducerFactory());
     }
+
+
+    @Bean
+    ProducerFactory<Long, NoteEventData> noteProducerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }
+
+    @Bean
+    KafkaTemplate<Long, NoteEventData> noteKafkaTemplate() {
+        return new KafkaTemplate<>(noteProducerFactory());
+    }
+
     NewTopic createTopicNoteCreated() {
         return TopicBuilder.name("NOTE_CREATED")
                 .partitions(3)
