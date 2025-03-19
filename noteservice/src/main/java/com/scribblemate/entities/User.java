@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user")
@@ -79,5 +80,18 @@ public class User implements Authentication {
     @Override
     public String getName() {
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(email, user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email);
     }
 }

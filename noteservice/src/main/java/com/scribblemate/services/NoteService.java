@@ -119,8 +119,9 @@ public class NoteService {
     public NoteDto deleteCollaboratorFromNote(Long userId, Long noteId, String collaboratorEmail) {
         User user = checkUserAndReturn(userId);
         SpecificNote specificNote = checkSpecificNoteAndReturn(user, noteId);
+        Note commonNote = null;
         try {
-            Note commonNote = specificNote.getCommonNote();
+            commonNote = specificNote.getCommonNote();
             User collaborator = userRepository.findByEmail(collaboratorEmail)
                     .orElseThrow(() -> new CollaboratorDoesNotExistException(
                             ResponseErrorUtils.COLLABORATOR_DOES_NOT_EXIST_ERROR.getMessage()));
@@ -134,8 +135,7 @@ public class NoteService {
                 entityManager.clear();
                 log.info(NoteUtils.COLLABORATOR_DELETE_SUCCESS, collaborator);
             }
-            SpecificNote updatedNote = specificNoteRepository.findById(noteId).get();
-            Note updatedCommonNote = updatedNote.getCommonNote();
+            Note updatedCommonNote = noteRepository.findById(commonNote.getId()).get();
             return setNoteDtoFromNote(updatedCommonNote, user);
         } catch (Exception ex) {
             log.error(NoteUtils.COLLABORATOR_DELETE_ERROR, collaboratorEmail, ex.getMessage());
@@ -337,6 +337,7 @@ public class NoteService {
                 noteRepository.deleteById(commonNote.getId());
                 log.info(NoteUtils.NOTE_PERMANENT_DELETE_SUCCESS);
             } else {
+                specificNote.getLabelSet().clear();
                 commonNote.getSpecificNoteList().remove(specificNote);
                 commonNote.getCollaboratorList().remove(user);
                 specificNoteRepository.deleteByIdAndUser(noteId, user);
@@ -345,6 +346,7 @@ public class NoteService {
             // Event publishing for deleting labels can be possible , OR
             // Feign call to label service for deleting all Labels for note
 //            feignService.deleteAllLabelsForNote(noteId);
+            kafkaProducerService.publishNoteDeletedEvent(noteId, user.getEmail());
             log.info(NoteUtils.LABEL_DELETE_SUCCESS);
             return true;
         } catch (Exception ex) {
@@ -461,8 +463,7 @@ public class NoteService {
         note.setImages(noteDto.getImages());
         Note mappedNote = noteRepository.save(note);
         if (noteDto.getCollaboratorList() != null) {
-            List<CollaboratorDto> collabDtoList = noteDto.getCollaboratorList().stream()
-                    .filter(collaborator -> !collaborator.getEmail().equals(user.getEmail())).toList();
+            List<CollaboratorDto> collabDtoList = noteDto.getCollaboratorList();
             List<String> collaboratorEmails = collabDtoList.stream().map(collaborator -> collaborator.getEmail())
                     .collect(Collectors.toList());
             Iterable<String> iterableEmails = collaboratorEmails;
@@ -479,6 +480,7 @@ public class NoteService {
             });
             List<User> collabList = mappedNote.getCollaboratorList();
             collabList.addAll(nonExistingCollaboratorList);
+            collabList.add(user);
         }
         Note savedNote = noteRepository.save(mappedNote);
         return savedNote;
@@ -537,7 +539,8 @@ public class NoteService {
         return updatedNote;
     }
 
-    public NoteDto getNoteById(User user, Long noteId) {
+    public NoteDto getNoteById(User currentUser, Long noteId) {
+        User user = checkUserAndReturn(currentUser.getId());
         SpecificNote specificNote = checkSpecificNoteAndReturn(user, noteId);
         Note note = specificNote.getCommonNote();
         NoteDto noteDto = setNoteDtoFromNote(note, user);

@@ -55,6 +55,11 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
 
     @Modifying
     @Transactional
+    @Query(value = "DELETE FROM label_note_ids lbn WHERE  lbn.note_id = :noteId ", nativeQuery = true)
+    int deleteNoteReferences(@Param("noteId") Long noteId);
+
+    @Modifying
+    @Transactional
     @Query(value = "DELETE ln FROM label_note_ids ln JOIN label lb ON ln.label_id = lb.id WHERE lb.user_id = :userId AND ln.note_id = :noteId", nativeQuery = true)
     int deleteLabelIdsByNoteId(@Param("noteId") Long noteId, @Param("userId") Long userId);
 

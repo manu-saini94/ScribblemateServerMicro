@@ -33,6 +33,8 @@ public class EventUtils {
     public static final String LABEL_DELETE_ERROR_EVENT = "Label delete error after event consumed";
     public static final String LABEL_UPDATE_SUCCESS_EVENT = "Label updated successfully after event consumed";
     public static final String LABEL_UPDATE_ERROR_EVENT = "Label update error after event consumed";
+    public static final String NOTE_DELETE_SUCCESS_EVENT = "Note deleted successfully after event consumed";
+    public static final String NOTE_DELETE_ERROR_EVENT = "Note delete error after event consumed";
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())

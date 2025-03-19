@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.scribblemate.common.dto.NoteLabelDto;
+import com.scribblemate.common.event.note.NoteEventData;
 import com.scribblemate.common.event.note.NoteLabelEventData;
 import com.scribblemate.common.event.note.NoteLabelIdsEventData;
 import com.scribblemate.common.exceptions.KafkaEventException;
@@ -240,6 +241,16 @@ public class LabelService {
             throw new LabelNotDeletedException(exp);
         }
     }
+    @Transactional
+    private Boolean deleteAllNoteReferences(Long noteId) {
+        try {
+            labelRepository.deleteNoteReferences(noteId);
+            return true;
+        } catch (Exception exp) {
+            log.error(EventUtils.NOTE_DELETE_ERROR_EVENT, noteId, exp.getMessage());
+            throw new LabelNotDeletedException(exp);
+        }
+    }
 
     /**
      * Kafka method for assigning labels to note
@@ -286,6 +297,7 @@ public class LabelService {
      * @param eventData
      * @param userEmail
      */
+    @Transactional
     public void unassignLabelInNote(NoteLabelEventData eventData, String userEmail) {
         try {
             User user = userRepository.findByEmail(userEmail).orElseThrow(() -> {
@@ -299,4 +311,25 @@ public class LabelService {
             throw new KafkaEventException(EventUtils.LABEL_DELETE_ERROR_EVENT, exp);
         }
     }
+
+    /**
+     * Kafka method for deleting note references
+     * @param noteData
+     */
+    @Transactional
+    public void deleteNoteAfterEvent(NoteEventData noteData,String userEmail) {
+        try {
+            User user = userRepository.findByEmail(userEmail).orElseThrow(() -> {
+                log.error(UserUtils.ERROR_USER_NOT_FOUND, userEmail);
+                return new UserNotFoundException();
+            });
+            deleteAllNoteReferences(noteData.getId());
+            log.info(EventUtils.NOTE_DELETE_SUCCESS_EVENT);
+        } catch (Exception exp) {
+            log.error(EventUtils.NOTE_DELETE_ERROR_EVENT);
+            throw new KafkaEventException(EventUtils.NOTE_DELETE_ERROR_EVENT, exp);
+        }
+    }
+
+
 }
